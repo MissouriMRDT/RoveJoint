@@ -4,10 +4,14 @@ void setup()
 {
   Serial.begin(9600);
 <<<<<<< HEAD
+<<<<<<< HEAD
   RoveComm.begin(131);
 =======
   RoveComm.begin(RC_ARMBOARD_FOURTHOCTET);
 >>>>>>> face3f1... Initial code dump, needs restructuring
+=======
+  RoveComm.begin(RC_ARMBOARD_FOURTHOCTET);
+>>>>>>> face3f141de0360c5160b71f2ba15fcf0535faf0
 }
 
 void loop()
@@ -19,6 +23,7 @@ void loop()
  {
    int16_t bicepVals[4];
    int16_t forearmVals[3];
+<<<<<<< HEAD
 <<<<<<< HEAD
 
    Serial.println("Joint 1");
@@ -46,6 +51,8 @@ void loop()
 
    //sending the motor commands to their specific boards
 =======
+=======
+>>>>>>> face3f141de0360c5160b71f2ba15fcf0535faf0
    Serial.println("We have a packet");
    Serial.println("Entry 1");
    Serial.println(rovecomm_packet.data[0]);
@@ -129,7 +136,10 @@ void loop()
    //forearmVals[1] = rovecomm_packet.data[4]; //J6
    //forearmVals[2] = rovecomm_packet.data[6]; //J6
 
+<<<<<<< HEAD
 >>>>>>> face3f1... Initial code dump, needs restructuring
+=======
+>>>>>>> face3f141de0360c5160b71f2ba15fcf0535faf0
    RoveComm.writeTo(RC_ARMBOARD_BICEP_DATAID, 4, bicepVals, 192, 168, 1, RC_BICEP_FOURTHOCTET, 11000);
    RoveComm.writeTo(RC_ARMBOARD_FOREARM_DATAID, 3, forearmVals, 192, 168, 1, RC_FOREARM_FOURTHOCTET, 11000);
 
