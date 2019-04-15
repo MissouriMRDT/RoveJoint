@@ -8,6 +8,7 @@
 #include "RoveStmVnhPwm.h"
 #include "RoveUsDigiMa3Pwm.h"
 #include "RoveBoardMap.h"
+#include "RoveWatchdog.h"
 
 #include <stdint.h>
 
@@ -28,7 +29,7 @@ class RoveDifferentialJoint
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Calculations
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    void tiltTwistDecipercent( int tilt_decipercent, int twist_decipercent );
+    void tiltTwistDecipercent( int tilt_decipercent, int twist_decipercent, bool right_compensation=false, bool left_compensation=false );
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Encoder Handling
