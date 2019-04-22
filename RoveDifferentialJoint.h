@@ -9,6 +9,7 @@
 #include "RoveUsDigiMa3Pwm.h"
 #include "RoveBoardMap.h"
 #include "RoveWatchdog.h"
+#include "RovePid"
 
 #include <stdint.h>
 
@@ -26,6 +27,12 @@ class RoveDifferentialJoint
 
     RoveUsDigiMa3Pwm   TiltEncoder;
     RoveUsDigiMa3Pwm   TwistEncoder;
+
+    RovePidInts TiltPid;
+    RovePidInts TwistPid;
+
+    enum comp_side {None, Left, Right};
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Calculations
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,10 +41,6 @@ class RoveDifferentialJoint
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Encoder Handling
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    int  readTiltEncoderMillidegrees();
-    int  readTiltEncoderRadians();
-    int  readTwistEncoderMillidegrees();
-    int  readTwistEncoderRadians();
 
     bool TwistEncoderDisconnect();
 
@@ -45,4 +48,4 @@ class RoveDifferentialJoint
 
 };
 
-#endif // ROVE_DIFF_STM_VNH_US_DIGI_MA3_H
+#endif // ROVE_DIFF
