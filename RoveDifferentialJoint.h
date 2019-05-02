@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// MRDT 2019 => Energia Texas Instruments Tiva C, Todo
+// MRDT Differential Joint 2019
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef ROVE_DIFF
@@ -9,15 +9,10 @@
 #include "RoveUsDigiMa3Pwm.h"
 #include "RoveBoardMap.h"
 #include "RoveWatchdog.h"
-#include "RovePid"
+#include "RovePid.h"
 
 #include <stdint.h>
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Given a RoveJoint instance
-// RoveDifferential    RoveJoint;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class RoveDifferentialJoint
 {
   public:
@@ -28,15 +23,29 @@ class RoveDifferentialJoint
     RoveUsDigiMa3Pwm   TiltEncoder;
     RoveUsDigiMa3Pwm   TwistEncoder;
 
-    RovePidInts TiltPid;
-    RovePidInts TwistPid;
+    RovePidFloats TiltPid;
+    RovePidFloats TwistPid;
 
     enum comp_side {None, Left, Right};
+
+    uint8_t LS_UPPER = INVALID;
+    uint8_t LS_LOWER = INVALID;
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    //Limit Switch Handling
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    //Since we don't have a class for this we are going to just pass all the neccessary pin values
+    //Maybe when I get bored I will add an unneccessary class for this
+    void attachLimitSwitches(uint8_t upperPin, uint8_t lowerPin);
+    //returns whether or not the Limit switch is pressed (if we are moving past that given limit)
+    bool LowerLSPressed();
+    bool UpperLSPressed();
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Calculations
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    void tiltTwistDecipercent( int tilt_decipercent, int twist_decipercent, bool right_compensation=false, bool left_compensation=false );
+    void tiltTwistDecipercent( int tilt_decipercent, int twist_decipercent, comp_side compensation = None, float comp_factor=1.0);
+    void atTiltLimit(int drive_speed);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Encoder Handling
