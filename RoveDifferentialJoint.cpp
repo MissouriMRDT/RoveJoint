@@ -10,7 +10,29 @@
 
 
 //////////////////////////////////////////////////////////////////////////////
-/////Scale our motor speeds so we can do a simultaneous twist and tilt////////
+/////Limit Switch initalization and accessor functions
+//////////////////////////////////////////////////////////////////////////////
+void RoveDifferentialJoint::attachLimitSwitches(uint8_t upperPin, uint8_t lowerPin)
+{
+    LS_UPPER = upperPin;
+    LS_LOWER = lowerPin;
+}
+
+bool RoveDifferentialJoint::LowerLSPressed()
+{
+  //HIGH or LOW, but we can just map to a boolean
+  return (!digitalRead(LS_LOWER));
+}
+
+bool RoveDifferentialJoint::UpperLSPressed()
+{
+  //HIGH or LOW, but we can just map to a boolean
+  return (!digitalRead(LS_UPPER));
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+/////Scale our motor speeds so we can do a simultaneous twist and tilt
 //////////////////////////////////////////////////////////////////////////////
 void RoveDifferentialJoint::tiltTwistDecipercent( int tilt_decipercent, int twist_decipercent, comp_side compensation, float comp_factor)
 {
@@ -51,18 +73,9 @@ void RoveDifferentialJoint::tiltTwistDecipercent( int tilt_decipercent, int twis
   LeftMotor.drive(left_speed);
 }
 
-void RoveDifferentialJoint::LowerLSPressed()
-{
-  //HIGH or LOW, but we can just map to a boolean
-  return digitalRead(LS_LOWER);
-}
-
-void RoveDifferentialJoint::UpperLSPressed()
-{
-  //HIGH or LOW, but we can just map to a boolean
-  return digitalRead(LS_UPPER);
-}
-
+//////////////////////////////////////////////////////////////////////////////
+/////Returns whether we are moving past our limit switches
+//////////////////////////////////////////////////////////////////////////////
 bool RoveDifferentialJoint::atTiltLimit(int drive_speed)
 {
   //if we are trying to move downwards, and we are hitting the lower limit switch stop
@@ -79,10 +92,4 @@ bool RoveDifferentialJoint::atTiltLimit(int drive_speed)
   {
     return false;
   }
-}
-
-void RoveDifferentialJoint::attachLimitSwitches(uint8_t upperPin, uint8_t lowerPin)
-{
-    uint8_t LS_UPPER = upperPin;
-    uint8_t LS_LOWER = lowerPin;
 }

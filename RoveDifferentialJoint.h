@@ -45,7 +45,7 @@ class RoveDifferentialJoint
     //Calculations
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     void tiltTwistDecipercent( int tilt_decipercent, int twist_decipercent, comp_side compensation = None, float comp_factor=1.0);
-    void atTiltLimit(int drive_speed);
+    bool atTiltLimit(int drive_speed);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Encoder Handling
