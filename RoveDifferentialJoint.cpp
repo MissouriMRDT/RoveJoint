@@ -21,18 +21,27 @@ void RoveDifferentialJoint::attachLimitSwitches(uint8_t upperPin, uint8_t lowerP
 bool RoveDifferentialJoint::LowerLSPressed()
 {
   //HIGH or LOW, but we can just map to a boolean
-  return (!digitalRead(LS_LOWER));
+  return (digitalRead(LS_LOWER));
 }
 
 bool RoveDifferentialJoint::UpperLSPressed()
 {
   //HIGH or LOW, but we can just map to a boolean
-  return (!digitalRead(LS_UPPER));
+  return (digitalRead(LS_UPPER));
 }
 
+//////////////////////////////////////////////////////////////////////////////
+//Since we do not have limit switches for twist on the 2019 Valkyrie arm
+//we will instead set angle limits.
+/////////////////////////////////////////////////////////////////////////////
+void RoveDifferentialJoint::setTwistLimits(int left_lim, int right_lim)
+{
+  left_limit = left_lim;
+  right_limit = right_lim;
+}
 
 //////////////////////////////////////////////////////////////////////////////
-/////Scale our motor speeds so we can do a simultaneous twist and tilt
+//Scale our motor speeds so we can do a simultaneous twist and tilt
 //////////////////////////////////////////////////////////////////////////////
 void RoveDifferentialJoint::tiltTwistDecipercent( int tilt_decipercent, int twist_decipercent, comp_side compensation, float comp_factor)
 {
@@ -74,17 +83,19 @@ void RoveDifferentialJoint::tiltTwistDecipercent( int tilt_decipercent, int twis
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/////Returns whether we are moving past our limit switches
+//Returns whether we are moving past our limit switches
 //////////////////////////////////////////////////////////////////////////////
 bool RoveDifferentialJoint::atTiltLimit(int drive_speed)
 {
   //if we are trying to move downwards, and we are hitting the lower limit switch stop
-  if(drive_speed < 0 && LowerLSPressed())
+  //the limit is hit if the switch is no longer being pressed
+  if(drive_speed < 0 && !LowerLSPressed())
   {
     return true;
   }
   //if we are trying to move upwards, and we are hitting the upper limit switch stop
-  else if(drive_speed > 0 && UpperLSPressed())
+  //the limit is hit if the switch is no longer being pressed
+  else if(drive_speed > 0 && !UpperLSPressed())
   {
     return true;
   }
@@ -93,3 +104,25 @@ bool RoveDifferentialJoint::atTiltLimit(int drive_speed)
     return false;
   }
 }
+
+//////////////////////////////////////////////////////////////////////////////
+//Returns whether we are moving past our angle limits
+//////////////////////////////////////////////////////////////////////////////
+bool RoveDifferentialJoint::atTwistLimit(int drive_speed, uint32_t current_angle)
+{
+  //if we are driving to the left, and we are past the limits
+  if(drive_speed < 0 && (current_angle <= left_limit))
+  {
+    return true;
+  }
+  //if we are driving to the right, and we are past the limits
+  else if(drive_speed > 0 && (current_angle <= left_limit))
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
