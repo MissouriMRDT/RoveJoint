@@ -43,12 +43,14 @@ class RoveDifferentialJoint
     //returns whether or not the Limit switch is pressed (if we are moving past that given limit)
     bool LowerLSPressed();
     bool UpperLSPressed();
+    void setTwistLimits(int left_lim, int right_lim);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Calculations
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     void tiltTwistDecipercent( int tilt_decipercent, int twist_decipercent, comp_side compensation = None, float comp_factor=1.0);
     bool atTiltLimit(int drive_speed);
+    bool atTwistLimit(int drive_speed, uint32_t current_angle);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Encoder Handling
