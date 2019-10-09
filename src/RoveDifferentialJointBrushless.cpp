@@ -6,7 +6,7 @@
 #include "RoveBoardMap.h"
 #include "Energia.h"
 #include <stdint.h>
-#include "RoveDifferentialJoint.h"
+#include "RoveDifferentialJointBrushless.h"
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -73,11 +73,26 @@ void RoveDifferentialJoint::tiltTwistDecipercent( int tilt_decipercent, int twis
   if(compensation == Right)
   {
     right_speed = (right_speed*comp_factor);
+    left_speed = (left_speed*(1/comp_factor));
   }
   if(compensation == Left)
   {
     left_speed = (left_speed*comp_factor);
+    right_speed = (right_speed*(1/comp_factor));
   }
+
+  if(left_speed < -1000)
+     left_speed = -999;
+
+  if(right_speed < -1000)
+     right_speed = -999;
+
+  if(left_speed > 1000)
+     left_speed = 999;
+
+  if(right_speed > 1000)
+     right_speed = 999;
+
   RightMotor.drive(right_speed);
   LeftMotor.drive(left_speed);
 }
@@ -89,13 +104,13 @@ bool RoveDifferentialJoint::atTiltLimit(int drive_speed)
 {
   //if we are trying to move downwards, and we are hitting the lower limit switch stop
   //the limit is hit if the switch is no longer being pressed
-  if(drive_speed < 0 && !LowerLSPressed())
+  if(drive_speed > 0 && !LowerLSPressed())
   {
     return true;
   }
   //if we are trying to move upwards, and we are hitting the upper limit switch stop
   //the limit is hit if the switch is no longer being pressed
-  else if(drive_speed > 0 && !UpperLSPressed())
+  else if(drive_speed < 0 && !UpperLSPressed())
   {
     return true;
   }
@@ -110,13 +125,14 @@ bool RoveDifferentialJoint::atTiltLimit(int drive_speed)
 //////////////////////////////////////////////////////////////////////////////
 bool RoveDifferentialJoint::atTwistLimit(int drive_speed, uint32_t current_angle)
 {
+
   //if we are driving to the left, and we are past the limits
-  if(drive_speed < 0 && (current_angle <= left_limit))
+  if(drive_speed < 0 && (current_angle <= left_limit && current_angle > 180000))
   {
     return true;
   }
   //if we are driving to the right, and we are past the limits
-  else if(drive_speed > 0 && (current_angle <= left_limit))
+  else if(drive_speed > 0 && (current_angle >= right_limit && current_angle < 180000))
   {
     return true;
   }

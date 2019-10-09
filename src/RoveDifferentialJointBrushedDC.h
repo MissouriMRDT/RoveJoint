@@ -20,8 +20,8 @@ class RoveDifferentialJoint
     RoveStmVnhPwm RightMotor;
     RoveStmVnhPwm LeftMotor;
 
-    RoveUsDigiMa3Pwm   TiltEncoder;
-    RoveUsDigiMa3Pwm   TwistEncoder;
+    RoveUsDigiMa3Pwm TiltEncoder;
+    RoveUsDigiMa3Pwm TwistEncoder;
 
     RovePidFloats TiltPid;
     RovePidFloats TwistPid;
@@ -37,8 +37,6 @@ class RoveDifferentialJoint
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Limit Switch Handling
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    //Since we don't have a class for this we are going to just pass all the neccessary pin values
-    //Maybe when I get bored I will add an unneccessary class for this
     void attachLimitSwitches(uint8_t upperPin, uint8_t lowerPin);
     //returns whether or not the Limit switch is pressed (if we are moving past that given limit)
     bool LowerLSPressed();
@@ -55,9 +53,7 @@ class RoveDifferentialJoint
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Encoder Handling
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-
     bool TwistEncoderDisconnect();
-
     bool TiltEncoderDisconnect();
 
 };
