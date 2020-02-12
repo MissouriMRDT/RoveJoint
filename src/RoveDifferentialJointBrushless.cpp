@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// MRDT Differential Joint 2019
+// MRDT Differential Joint 2020
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "RoveStmVnhPwm.h"
 #include "RoveUsDigiMa3Pwm.h"
@@ -18,13 +18,13 @@ void RoveDifferentialJoint::attachLimitSwitches(uint8_t upperPin, uint8_t lowerP
     LS_LOWER = lowerPin;
 }
 
-bool RoveDifferentialJoint::LowerLSPressed()
+bool RoveDifferentialJoint::isLowerLSPressed()
 {
   //HIGH or LOW, but we can just map to a boolean
   return (digitalRead(LS_LOWER));
 }
 
-bool RoveDifferentialJoint::UpperLSPressed()
+bool RoveDifferentialJoint::isUpperLSPressed()
 {
   //HIGH or LOW, but we can just map to a boolean
   return (digitalRead(LS_UPPER));
@@ -45,54 +45,43 @@ void RoveDifferentialJoint::setTwistLimits(int left_lim, int right_lim)
 //////////////////////////////////////////////////////////////////////////////
 void RoveDifferentialJoint::tiltTwistDecipercent( int tilt_decipercent, int twist_decipercent, comp_side compensation, float comp_factor)
 {
-  int left_speed  = tilt_decipercent - twist_decipercent;
-	int right_speed = tilt_decipercent + twist_decipercent;
+  int left_speed = tilt_decipercent + twist_decipercent;
+  int right_speed = tilt_decipercent - twist_decipercent;
 
-	if(left_speed > 1000)
-	{
-	  right_speed = right_speed-(left_speed-1000);
-	  left_speed = 1000;
-	}
-	else if(left_speed < - 1000)
-	{
-	  right_speed = right_speed+(abs(left_speed)-1000);
-	  left_speed = -1000;
-	}
-	else if(right_speed > 1000)
-	{
-	  left_speed = left_speed-(right_speed-1000);
-	  right_speed = 1000;
-	}
-	else if(right_speed < - 1000)
-	{
-	  left_speed = left_speed+(abs(right_speed)-1000);
-	  right_speed = -1000;
-	}
-  
-  //compensation of motors, added because belt tensioning was unequal
-  if(compensation == Right)
-  {
-    right_speed = (right_speed*comp_factor);
-    left_speed = (left_speed*(1/comp_factor));
-  }
-  if(compensation == Left)
-  {
-    left_speed = (left_speed*comp_factor);
-    right_speed = (right_speed*(1/comp_factor));
-  }
-
-  if(left_speed < -1000)
-     left_speed = -999;
-
-  if(right_speed < -1000)
-     right_speed = -999;
-
+  //adjust the speeds to scale between -1000 and 1000
   if(left_speed > 1000)
-     left_speed = 999;
-
-  if(right_speed > 1000)
-     right_speed = 999;
-
+  {
+      left_speed /= 2;
+      if(right_speed!=0)
+      {
+          right_speed/=2;
+      }
+  }
+  else if(left_speed < -1000)
+  {
+      left_speed/=2;
+      if(right_speed!=0)
+      {
+          right_speed/=2;
+      }
+  }
+  else if(right_speed > 1000)
+  {
+      right_speed/=2;
+      if(left_speed!=0)
+      {
+          left_speed/=2;
+      }
+  }
+  else if(right_speed < -1000)
+  {
+      right_speed/=2;
+      if(left_speed!=0)
+      {
+          left_speed/=2;
+      }
+  }
+  
   RightMotor.drive(right_speed);
   LeftMotor.drive(left_speed);
 }
@@ -104,13 +93,13 @@ bool RoveDifferentialJoint::atTiltLimit(int drive_speed)
 {
   //if we are trying to move downwards, and we are hitting the lower limit switch stop
   //the limit is hit if the switch is no longer being pressed
-  if(drive_speed > 0 && !LowerLSPressed())
+  if(drive_speed > 0 && !isLowerLSPressed())
   {
     return true;
   }
   //if we are trying to move upwards, and we are hitting the upper limit switch stop
   //the limit is hit if the switch is no longer being pressed
-  else if(drive_speed < 0 && !UpperLSPressed())
+  else if(drive_speed < 0 && !isUpperLSPressed())
   {
     return true;
   }

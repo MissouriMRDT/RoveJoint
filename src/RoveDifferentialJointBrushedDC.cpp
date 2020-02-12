@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// MRDT Differential Joint 2019
+// MRDT Differential Joint 2020
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "RoveStmVnhPwm.h"
 #include "RoveUsDigiMa3Pwm.h"
@@ -18,13 +18,13 @@ void RoveDifferentialJoint::attachLimitSwitches(uint8_t upperPin, uint8_t lowerP
     LS_LOWER = lowerPin;
 }
 
-bool RoveDifferentialJoint::LowerLSPressed()
+bool RoveDifferentialJoint::isLowerLSPressed()
 {
   //HIGH or LOW, but we can just map to a boolean
   return (digitalRead(LS_LOWER));
 }
 
-bool RoveDifferentialJoint::UpperLSPressed()
+bool RoveDifferentialJoint::isUpperLSPressed()
 {
   //HIGH or LOW, but we can just map to a boolean
   return (digitalRead(LS_UPPER));
@@ -104,13 +104,13 @@ bool RoveDifferentialJoint::atTiltLimit(int drive_speed)
 {
   //if we are trying to move downwards, and we are hitting the lower limit switch stop
   //the limit is hit if the switch is no longer being pressed
-  if(drive_speed > 0 && !LowerLSPressed())
+  if(drive_speed > 0 && !isLowerLSPressed())
   {
     return true;
   }
   //if we are trying to move upwards, and we are hitting the upper limit switch stop
   //the limit is hit if the switch is no longer being pressed
-  else if(drive_speed < 0 && !UpperLSPressed())
+  else if(drive_speed < 0 && !isUpperLSPressed())
   {
     return true;
   }

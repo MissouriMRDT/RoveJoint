@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// MRDT Differential Joint 2019
+// MRDT Differential Joint 2020
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef ROVE_DIFF
-#define ROVE_DIFF
+#ifndef ROVE_DIFF_BRUSHLESS
+#define ROVE_DIFF_BRUSHLESS
 
-#include "RoveStmVnhPwm.h"
+#include "RovesODrive.h"
 #include "RoveUsDigiMa3Pwm.h"
 #include "RoveBoardMap.h"
 #include "RoveWatchdog.h"
@@ -17,11 +17,11 @@ class RoveDifferentialJoint
 {
   public:
 
-    //TODO: Integrate the ODrive interfacing library so that we can call ODrive functions from within RoveJoint
     RoveUsDigiMa3Pwm TiltEncoder;
     RoveUsDigiMa3Pwm TwistEncoder;
 
-    enum comp_side {None, Left, Right};
+    RovePidFloats TiltPid;
+    RovePidFloats TwistPid;
 
     uint8_t LS_UPPER = INVALID;
     uint8_t LS_LOWER = INVALID;
@@ -34,8 +34,8 @@ class RoveDifferentialJoint
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     void attachLimitSwitches(uint8_t upperPin, uint8_t lowerPin);
     //returns whether or not the Limit switch is pressed (if we are moving past that given limit)
-    bool LowerLSPressed();
-    bool UpperLSPressed();
+    bool isLowerLSPressed();
+    bool isUpperLSPressed();
     //sets angle limits to use as hardstops for movement on an axis without limit switches
     void setTwistLimits(int left_lim, int right_lim);
 
