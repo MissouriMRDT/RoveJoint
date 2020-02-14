@@ -10,18 +10,24 @@
 #include "RoveBoardMap.h"
 #include "RoveWatchdog.h"
 #include "RovePid.h"
+#include "Energia.h"
 
 #include <stdint.h>
 
-class RoveDifferentialJoint
+class RoveDifferentialJointBrushless
 {
   public:
 
+    const int MAX_SPEED_REVERSE;
+    const int MAX_SPEED_FORWARD;
+    
     RoveUsDigiMa3Pwm TiltEncoder;
     RoveUsDigiMa3Pwm TwistEncoder;
 
     RovePidFloats TiltPid;
     RovePidFloats TwistPid;
+
+    RovesODrive Joint;
 
     uint8_t LS_UPPER = INVALID;
     uint8_t LS_LOWER = INVALID;
@@ -30,9 +36,14 @@ class RoveDifferentialJoint
     int right_limit = 0;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    //Constructor
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    RoveDifferentialJointBrushless(HardwareSerial* odrive_serial, uint8_t tilt_encoder_pin, uint8_t twist_encoder_pin);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Limit Switch Handling
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    void attachLimitSwitches(uint8_t upperPin, uint8_t lowerPin);
+    void attachLimitSwitches(uint8_t upper_pin, uint8_t lower_pin);
     //returns whether or not the Limit switch is pressed (if we are moving past that given limit)
     bool isLowerLSPressed();
     bool isUpperLSPressed();
@@ -40,9 +51,14 @@ class RoveDifferentialJoint
     void setTwistLimits(int left_lim, int right_lim);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    //Handle ODrive errors 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    handleError();
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Calculations
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    void tiltTwistDecipercent( int tilt_decipercent, int twist_decipercent, comp_side compensation = None, float comp_factor=1.0);
+    void tiltTwistDecipercent( int tilt_decipercent, int twist_decipercent);
     bool atTiltLimit(int drive_speed);
     bool atTwistLimit(int drive_speed, uint32_t current_angle);
     //TODO: move_to_position wrapper based off of commanded positions and absolute/incremental encoder output
