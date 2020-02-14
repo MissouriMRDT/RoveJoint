@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 /////Setups the Joint with necessary pins and constants
 //////////////////////////////////////////////////////////////////////////////
-RoveDifferentialJointBrushless::RoveDifferentialJointBrushless(HardwareSerial* odrive_serial, uint8_t tilt_encoder_pin, uint8_t twist_encoder_pin, int max_forward, int max_reverse) :
+RoveDifferentialJointBrushless::RoveDifferentialJointBrushless(HardwareSerial* odrive_serial, RoveCommEthernet *RoveComm, uint8_t tilt_encoder_pin, uint8_t twist_encoder_pin, int max_forward, int max_reverse) :
                                                                MAX_SPEED_FORWARD(max_forward), MAX_SPEED_REVERSE(max_reverse)
 {
   //attach the encoder pins
@@ -25,35 +25,52 @@ RoveDifferentialJointBrushless::RoveDifferentialJointBrushless(HardwareSerial* o
 //////////////////////////////////////////////////////////////////////////////
 /////Handle various ODrive errors, and report them
 //////////////////////////////////////////////////////////////////////////////
-RoveDifferentialJointBrushless::handleError()
+JointError RoveDifferentialJointBrushless::handleError()
 {
-  int motorError = Joint.checkMotorErrors();
+  uint8_t motorError = Joint.checkMotorErrors();
   if(motorError)
   {
     Serial.println("Motor Error:");
     Serial.println(motorError);
+    return JointError(ERROR_MOTOR, motorError);
   }
   
-  int encoderError = Joint.checkEncoderErrors();
+  uint8_t encoderError = Joint.checkEncoderErrors();
   if(encoderError)
   {
     Serial.println("Encoder Error:");
     Serial.println(encoderError);
+    return JointError(ERROR_ENCODER, encoderError);
   }
 
-  int axisError = Joint.checkAxisErrors();
+  uint8_t axisError = Joint.checkAxisErrors();
   if(axisError))
   {
     Serial.println("Axis Error:");
     Serial.println(axisError);
+    return JointError(ERROR_AXIS, axisError);
   }
 
-  int controllerError = Joint.checkControllerErrors();
+  uint8_t controllerError = Joint.checkControllerErrors();
   if(controllerError)
   {
     Serial.println("Controller Error:");
     Serial.println(controllerError);
+    return JointError(ERROR_CONTROLLER, controllerError);
   }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+//Get absolute angles 
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+float getTiltAngle()
+{
+  return TiltEncoder.readDegrees();
+}
+
+float getTwistAngle()
+{
+  return TwistEncoder.readDegrees();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -90,7 +107,7 @@ void RoveDifferentialJointBrushless::setTwistLimits(int left_lim, int right_lim)
 //////////////////////////////////////////////////////////////////////////////
 //Scale our motor speeds so we can do a simultaneous twist and tilt
 //////////////////////////////////////////////////////////////////////////////
-void RoveDifferentialJointBrushless::tiltTwistDecipercent( int tilt_decipercent, int twist_decipercent, comp_side compensation, float comp_factor)
+JointError RoveDifferentialJointBrushless::tiltTwistDecipercent( int tilt_decipercent, int twist_decipercent, comp_side compensation, float comp_factor)
 {
   int left_speed = tilt_decipercent + twist_decipercent;
   int right_speed = tilt_decipercent - twist_decipercent;
@@ -136,6 +153,7 @@ void RoveDifferentialJointBrushless::tiltTwistDecipercent( int tilt_decipercent,
   //write the speed set point to the motors
   Joint.left.writeVelocitySetpoint(right_speed, 0);
   Joint.right.writeVelocitySetpoint(left_speed, 0);
+  return handleError();
 }
 
 //////////////////////////////////////////////////////////////////////////////

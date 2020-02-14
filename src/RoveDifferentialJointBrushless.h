@@ -11,8 +11,24 @@
 #include "RoveWatchdog.h"
 #include "RovePid.h"
 #include "Energia.h"
+#include "RoveComm.h"
 
 #include <stdint.h>
+
+//struct to return the appropriate errors/error types for Odrives
+//check the mappings in RovesODrive.h
+struct JointError
+{
+  Error_Type ErrorType;
+  uint8_t    Error;
+
+  //constructor
+  JointError(Error_Type type, uint8_t odrive_error)
+  {
+    ErrorType = type;
+    Error = odrive_error;
+  }
+};
 
 class RoveDifferentialJointBrushless
 {
@@ -20,7 +36,7 @@ class RoveDifferentialJointBrushless
 
     const int MAX_SPEED_REVERSE;
     const int MAX_SPEED_FORWARD;
-    
+
     RoveUsDigiMa3Pwm TiltEncoder;
     RoveUsDigiMa3Pwm TwistEncoder;
 
@@ -53,7 +69,13 @@ class RoveDifferentialJointBrushless
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Handle ODrive errors 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    handleError();
+    JointError handleError();
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    //Get absolute angles 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    float getTiltAngle();
+    float getTwistAngle();
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Calculations
