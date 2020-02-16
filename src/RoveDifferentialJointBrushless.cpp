@@ -1,13 +1,9 @@
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// MRDT Differential Joint 2020
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//MRDT Differential Joint 2020
 #include "RoveDifferentialJointBrushless.h"
 
-//////////////////////////////////////////////////////////////////////////////
-/////Setups the Joint with necessary pins and constants
-//////////////////////////////////////////////////////////////////////////////
-RoveDifferentialJointBrushless::RoveDifferentialJointBrushless(HardwareSerial* odrive_serial, RoveCommEthernet *RoveComm, uint8_t tilt_encoder_pin, uint8_t twist_encoder_pin, int max_forward, int max_reverse) :
-                                                               MAX_SPEED_FORWARD(max_forward), MAX_SPEED_REVERSE(max_reverse)
+//Setups the Joint with necessary pins and constants
+RoveDifferentialJointBrushless::RoveDifferentialJointBrushless(HardwareSerial* odrive_serial, RoveCommEthernet *RoveComm, uint8_t tilt_encoder_pin, uint8_t twist_encoder_pin, int gear_ratio, int max_forward, int max_reverse) :
+                                                               GEAR_RATIO(gear_ratio), MAX_SPEED_FORWARD(max_forward), MAX_SPEED_REVERSE(max_reverse)
 {
   //attach the encoder pins
   TiltEncoder.attach(tilt_encoder_pin);
@@ -22,9 +18,7 @@ RoveDifferentialJointBrushless::RoveDifferentialJointBrushless(HardwareSerial* o
   delay(100);  
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/////Handle various ODrive errors, and report them
-//////////////////////////////////////////////////////////////////////////////
+//Handle various ODrive errors, and report them
 JointError RoveDifferentialJointBrushless::handleError()
 {
   uint8_t motorError = Joint.checkMotorErrors();
@@ -60,9 +54,7 @@ JointError RoveDifferentialJointBrushless::handleError()
   }
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////
 //Get absolute angles 
-///////////////////////////////////////////////////////////////////////////////////////////////////////
 float getTiltAngle()
 {
   return TiltEncoder.readDegrees();
@@ -73,9 +65,7 @@ float getTwistAngle()
   return TwistEncoder.readDegrees();
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/////Limit Switch initalization and accessor functions
-//////////////////////////////////////////////////////////////////////////////
+//Limit Switch initalization and accessor functions
 void RoveDifferentialJointBrushless::attachLimitSwitches(uint8_t upperPin, uint8_t lowerPin)
 {
     LS_UPPER = upperPin;
@@ -94,19 +84,15 @@ bool RoveDifferentialJointBrushless::isUpperLSPressed()
   return (digitalRead(LS_UPPER));
 }
 
-//////////////////////////////////////////////////////////////////////////////
 //Since we do not have limit switches for twist on the 2020 Icarus arm
 //we will instead set angle limits.
-/////////////////////////////////////////////////////////////////////////////
 void RoveDifferentialJointBrushless::setTwistLimits(int left_lim, int right_lim)
 {
   left_limit = left_lim;
   right_limit = right_lim;
 }
 
-//////////////////////////////////////////////////////////////////////////////
 //Scale our motor speeds so we can do a simultaneous twist and tilt
-//////////////////////////////////////////////////////////////////////////////
 JointError RoveDifferentialJointBrushless::tiltTwistDecipercent( int tilt_decipercent, int twist_decipercent, comp_side compensation, float comp_factor)
 {
   int left_speed = tilt_decipercent + twist_decipercent;
@@ -156,9 +142,7 @@ JointError RoveDifferentialJointBrushless::tiltTwistDecipercent( int tilt_decipe
   return handleError();
 }
 
-//////////////////////////////////////////////////////////////////////////////
 //Returns whether we are moving past our limit switches
-//////////////////////////////////////////////////////////////////////////////
 bool RoveDifferentialJointBrushless::atTiltLimit(int drive_speed)
 {
   //if we are trying to move downwards, and we are hitting the lower limit switch stop
@@ -179,9 +163,7 @@ bool RoveDifferentialJointBrushless::atTiltLimit(int drive_speed)
   }
 }
 
-//////////////////////////////////////////////////////////////////////////////
 //Returns whether we are moving past our angle limits
-//////////////////////////////////////////////////////////////////////////////
 bool RoveDifferentialJointBrushless::atTwistLimit(int drive_speed, uint32_t current_angle)
 {
 
@@ -201,3 +183,38 @@ bool RoveDifferentialJointBrushless::atTwistLimit(int drive_speed, uint32_t curr
   }
 }
 
+//Calculate position value from given angle
+int getPositionCount(float angle) 
+{
+  return(abs( (angle*ENC_CPR) / (gear_ratio*2*pi()) ));
+}
+
+
+
+//Move the arm based on position control from odrives
+void posMoveTilt(float tilt_angle_relative, float tilt_velocity)
+{
+  int positionCount = getPositionCount(tilt_angle);
+  //Tilt, so both motors should go same direction
+  if(tilt_angle < 0) 
+  {
+    tilt_velocity *= -1;
+  }
+  joint.left.writePosSetPoint(positionCount, tilt_velocity, 0);
+  joint.right.writePosSetPoint(positionCount, tilt_velocity, 0);
+}
+
+void posMoveTwist(float twist_angle_relative, float twist_velocity)
+{
+  oppositeVelocity = twist_velocity * -1;
+  int positionCount = getPositionCount(twist_angle);
+  if(twist_angle < 0) 
+  {
+    joint.left.writePosSetPoint(positionCount, oppositeVelocity, 0);
+    joint.right.writePosSetPoint(positionCount, twist_velocity, 0);
+  }
+  else {
+    joint.left.writePosSetPoint(positionCount, twist_velocity, 0);
+    joint.right.writePosSetPoint(positionCount, oppositeVelocity, 0);
+  }
+}
