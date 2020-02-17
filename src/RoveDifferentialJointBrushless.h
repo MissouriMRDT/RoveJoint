@@ -56,7 +56,7 @@ class RoveDifferentialJointBrushless
 
     
     //Constructor
-    RoveDifferentialJointBrushless(HardwareSerial* odrive_serial, uint8_t tilt_encoder_pin, uint8_t twist_encoder_pin);
+    RoveDifferentialJointBrushless(const HardwareSerial* odrive_serial, uint8_t tilt_encoder_pin, uint8_t twist_encoder_pin, int gear_ratio, int max_forward, int max_reverse);
 
     //Limit Switch Handling
     void attachLimitSwitches(uint8_t upper_pin, uint8_t lower_pin);
@@ -74,15 +74,16 @@ class RoveDifferentialJointBrushless
     float getTwistAngle();
 
     //Calculations
-    void tiltTwistDecipercent( int tilt_decipercent, int twist_decipercent);
+    void tiltTwistDecipercent(int tilt_decipercent, int twist_decipercent);
     bool atTiltLimit(int drive_speed);
     bool atTwistLimit(int drive_speed, uint32_t current_angle);
     int getPositionCount(float angle);
     //TODO: move_to_position wrapper based off of commanded positions and absolute/incremental encoder output
     
     //Move the arm 
-    void posMoveTilt(float tilt_angle, float tilt_velocity);
-    void posMoveTwist(float twist_angle float twist_velocity);
+    //Don't pass 0 angle value
+    void posMoveTilt(float tilt_angle_relative, float tilt_velocity);
+    void posMoveTwist(float twist_angle_relative, float twist_velocity);
 
     //Encoder Handling
     bool TwistEncoderDisconnect();

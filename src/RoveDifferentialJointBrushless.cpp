@@ -2,13 +2,13 @@
 #include "RoveDifferentialJointBrushless.h"
 
 //Setups the Joint with necessary pins and constants
-RoveDifferentialJointBrushless::RoveDifferentialJointBrushless(HardwareSerial* odrive_serial, RoveCommEthernet *RoveComm, uint8_t tilt_encoder_pin, uint8_t twist_encoder_pin, int gear_ratio, int max_forward, int max_reverse) :
+RoveDifferentialJointBrushless::RoveDifferentialJointBrushless(HardwareSerial* odrive_serial, uint8_t tilt_encoder_pin, uint8_t twist_encoder_pin, int gear_ratio, int max_forward, int max_reverse) :
                                                                GEAR_RATIO(gear_ratio), MAX_SPEED_FORWARD(max_forward), MAX_SPEED_REVERSE(max_reverse)
 {
   //attach the encoder pins
   TiltEncoder.attach(tilt_encoder_pin);
   TwistEncoder.attach(twist_encoder_pin);
-
+  
   //start the odrive serial communication
   Joint.begin(odrive_serial);
   delay(100);
