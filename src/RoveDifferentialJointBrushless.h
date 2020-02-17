@@ -19,11 +19,11 @@
 //check the mappings in RovesODrive.h
 struct JointError
 {
-  Error_Type ErrorType;
+  Error_Types ErrorType;
   uint8_t    Error;
 
   //constructor
-  JointError(Error_Type type, uint8_t odrive_error)
+  JointError(Error_Types type, uint8_t odrive_error)
   {
     ErrorType = type;
     Error = odrive_error;
