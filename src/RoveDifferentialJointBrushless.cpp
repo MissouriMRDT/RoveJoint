@@ -167,7 +167,7 @@ JointError RoveDifferentialJointBrushless::tiltTwistDecipercent(int tilt_deciper
   
   //map the speed to the encoder counts/s the ODrives expect
   right_speed = map(right_speed, -1000, 1000, MAX_SPEED_REVERSE, MAX_SPEED_FORWARD);
-  right_speed = map(right_speed, -1000, 1000, MAX_SPEED_REVERSE, MAX_SPEED_FORWARD);
+  left_speed = map(left_speed, -1000, 1000, MAX_SPEED_REVERSE, MAX_SPEED_FORWARD);
 
   //write the speed set point to the motors
   Joint.left.writeVelocitySetpoint(right_speed, 0);
