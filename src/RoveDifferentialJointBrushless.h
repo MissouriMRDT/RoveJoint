@@ -13,6 +13,7 @@
 #include "Energia.h"
 #include "RoveComm.h"
 
+#include <math.h>
 #include <stdint.h>
 
 //struct to return the appropriate errors/error types for Odrives
@@ -56,7 +57,7 @@ class RoveDifferentialJointBrushless
 
     
     //Constructor
-    RoveDifferentialJointBrushless(const HardwareSerial* odrive_serial, uint8_t tilt_encoder_pin, uint8_t twist_encoder_pin, int gear_ratio, int max_forward, int max_reverse);
+    RoveDifferentialJointBrushless(HardwareSerial* odrive_serial, uint8_t tilt_encoder_pin, uint8_t twist_encoder_pin, int gear_ratio, int max_forward, int max_reverse);
 
     //Limit Switch Handling
     void attachLimitSwitches(uint8_t upper_pin, uint8_t lower_pin);
@@ -74,7 +75,7 @@ class RoveDifferentialJointBrushless
     float getTwistAngle();
 
     //Calculations
-    void tiltTwistDecipercent(int tilt_decipercent, int twist_decipercent);
+    JointError tiltTwistDecipercent(int tilt_decipercent, int twist_decipercent);
     bool atTiltLimit(int drive_speed);
     bool atTwistLimit(int drive_speed, uint32_t current_angle);
     int getPositionCount(float angle);

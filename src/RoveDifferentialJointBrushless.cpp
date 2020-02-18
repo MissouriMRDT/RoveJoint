@@ -14,53 +14,86 @@ RoveDifferentialJointBrushless::RoveDifferentialJointBrushless(HardwareSerial* o
   delay(100);
 
   //set the odrive state to closed loop control
-  Joint.writeState(AXIS_STATE_CLOSED_LOOP_CONTROL);
+  Joint.right.writeState(AXIS_STATE_CLOSED_LOOP_CONTROL);
+  Joint.left.writeState(AXIS_STATE_CLOSED_LOOP_CONTROL);
   delay(100);  
 }
 
 //Handle various ODrive errors, and report them
 JointError RoveDifferentialJointBrushless::handleError()
 {
-  uint8_t motorError = Joint.checkMotorErrors();
-  if(motorError)
+  uint8_t motorErrorR = Joint.right.checkMotorErrors();
+  if(motorErrorR)
   {
-    Serial.println("Motor Error:");
-    Serial.println(motorError);
-    return JointError(ERROR_MOTOR, motorError);
+    Serial.println("Right Motor Error:");
+    Serial.println(motorErrorR);
+    return JointError(ERROR_MOTOR, motorErrorR);
+  }
+
+  uint8_t motorErrorL = Joint.left.checkMotorErrors();
+  if(motorErrorL)
+  {
+    Serial.println("Left Motor Error:");
+    Serial.println(motorErrorL);
+    return JointError(ERROR_MOTOR, motorErrorL);
   }
   
-  uint8_t encoderError = Joint.checkEncoderErrors();
-  if(encoderError)
+  uint8_t encoderErrorR = Joint.right.checkEncoderErrors();
+  if(encoderErrorR)
   {
-    Serial.println("Encoder Error:");
-    Serial.println(encoderError);
-    return JointError(ERROR_ENCODER, encoderError);
+    Serial.println("Right Encoder Error:");
+    Serial.println(encoderErrorR);
+    return JointError(ERROR_ENCODER, encoderErrorR);
   }
 
-  uint8_t axisError = Joint.checkAxisErrors();
-  if(axisError))
+  uint8_t encoderErrorL = Joint.left.checkEncoderErrors();
+  if(encoderErrorL)
   {
-    Serial.println("Axis Error:");
-    Serial.println(axisError);
-    return JointError(ERROR_AXIS, axisError);
+    Serial.println("Left Encoder Error:");
+    Serial.println(encoderErrorL);
+    return JointError(ERROR_ENCODER, encoderErrorL);
   }
 
-  uint8_t controllerError = Joint.checkControllerErrors();
-  if(controllerError)
+  uint8_t axisErrorR = Joint.right.checkAxisErrors();
+  if(axisErrorR)
   {
-    Serial.println("Controller Error:");
-    Serial.println(controllerError);
-    return JointError(ERROR_CONTROLLER, controllerError);
+    Serial.println("Right Axis Error:");
+    Serial.println(axisErrorR);
+    return JointError(ERROR_AXIS, axisErrorR);
+  }
+
+  uint8_t axisErrorL = Joint.left.checkAxisErrors();
+  if(axisErrorL)
+  {
+    Serial.println("Left Axis Error:");
+    Serial.println(axisErrorL);
+    return JointError(ERROR_AXIS, axisErrorL);
+  }
+
+  uint8_t controllerErrorR = Joint.right.checkControllerErrors();
+  if(controllerErrorR)
+  {
+    Serial.println("Right Controller Error:");
+    Serial.println(controllerErrorR);
+    return JointError(ERROR_CONTROLLER, controllerErrorR);
+  }
+
+  uint8_t controllerErrorL = Joint.left.checkControllerErrors();
+  if(controllerErrorL)
+  {
+    Serial.println("Left Controller Error:");
+    Serial.println(controllerErrorL);
+    return JointError(ERROR_CONTROLLER, controllerErrorL);
   }
 }
 
 //Get absolute angles 
-float getTiltAngle()
+float RoveDifferentialJointBrushless::getTiltAngle()
 {
   return TiltEncoder.readDegrees();
 }
 
-float getTwistAngle()
+float RoveDifferentialJointBrushless::getTwistAngle()
 {
   return TwistEncoder.readDegrees();
 }
@@ -93,7 +126,7 @@ void RoveDifferentialJointBrushless::setTwistLimits(int left_lim, int right_lim)
 }
 
 //Scale our motor speeds so we can do a simultaneous twist and tilt
-JointError RoveDifferentialJointBrushless::tiltTwistDecipercent( int tilt_decipercent, int twist_decipercent, comp_side compensation, float comp_factor)
+JointError RoveDifferentialJointBrushless::tiltTwistDecipercent(int tilt_decipercent, int twist_decipercent)
 {
   int left_speed = tilt_decipercent + twist_decipercent;
   int right_speed = tilt_decipercent - twist_decipercent;
@@ -184,37 +217,37 @@ bool RoveDifferentialJointBrushless::atTwistLimit(int drive_speed, uint32_t curr
 }
 
 //Calculate position value from given angle
-int getPositionCount(float angle) 
+int RoveDifferentialJointBrushless::getPositionCount(float angle) 
 {
-  return(abs( (angle*ENC_CPR) / (gear_ratio*2*pi()) ));
+  return(abs( (angle*ENC_CPR) / (GEAR_RATIO*2*M_PI )) );
 }
 
 
 
 //Move the arm based on position control from odrives
-void posMoveTilt(float tilt_angle_relative, float tilt_velocity)
+void RoveDifferentialJointBrushless::posMoveTilt(float tilt_angle_relative, float tilt_velocity)
 {
-  int positionCount = getPositionCount(tilt_angle);
+  int positionCount = getPositionCount(tilt_angle_relative);
   //Tilt, so both motors should go same direction
-  if(tilt_angle < 0) 
+  if(tilt_angle_relative < 0) 
   {
     tilt_velocity *= -1;
   }
-  joint.left.writePosSetPoint(positionCount, tilt_velocity, 0);
-  joint.right.writePosSetPoint(positionCount, tilt_velocity, 0);
+  Joint.left.writePosSetPoint(positionCount, tilt_velocity, 0);
+  Joint.right.writePosSetPoint(positionCount, tilt_velocity, 0);
 }
 
-void posMoveTwist(float twist_angle_relative, float twist_velocity)
+void RoveDifferentialJointBrushless::posMoveTwist(float twist_angle_relative, float twist_velocity)
 {
-  oppositeVelocity = twist_velocity * -1;
-  int positionCount = getPositionCount(twist_angle);
-  if(twist_angle < 0) 
+  float oppositeVelocity = twist_velocity * -1;
+  int positionCount = getPositionCount(twist_angle_relative);
+  if(twist_angle_relative  < 0) 
   {
-    joint.left.writePosSetPoint(positionCount, oppositeVelocity, 0);
-    joint.right.writePosSetPoint(positionCount, twist_velocity, 0);
+    Joint.left.writePosSetPoint(positionCount, oppositeVelocity, 0);
+    Joint.right.writePosSetPoint(positionCount, twist_velocity, 0);
   }
   else {
-    joint.left.writePosSetPoint(positionCount, twist_velocity, 0);
-    joint.right.writePosSetPoint(positionCount, oppositeVelocity, 0);
+    Joint.left.writePosSetPoint(positionCount, twist_velocity, 0);
+    Joint.right.writePosSetPoint(positionCount, oppositeVelocity, 0);
   }
 }
