@@ -127,6 +127,16 @@ void RoveDifferentialJointBrushless::setTwistLimits(int left_lim, int right_lim)
   right_limit = right_lim;
 }
 
+void RoveDifferentialJointBrushless::attachTiltPID(float min_output, float max_output, float kp, float ki, float kd)
+{
+  TiltPid.attach(min_output, max_output, kp, ki, kd);
+}
+
+void RoveDifferentialJointBrushless::attachTwistPID(float min_output, float max_output, float kp, float ki, float kd)
+{
+  TwistPid.attach(min_output, max_output, kp, ki, kd);
+}
+
 //Scale our motor speeds so we can do a simultaneous twist and tilt
 void RoveDifferentialJointBrushless::tiltTwistDecipercent(int tilt_decipercent, int twist_decipercent)
 {
@@ -169,13 +179,12 @@ void RoveDifferentialJointBrushless::tiltTwistDecipercent(int tilt_decipercent, 
   }
   
 
-  Serial.println(right_speed);
-  Serial.println(left_speed);
-
   //map the speed to the encoder counts/s the ODrives expect
   right_speed = map(right_speed, -1000, 1000, MAX_SPEED_REVERSE, MAX_SPEED_FORWARD);
   left_speed = map(left_speed, -1000, 1000, MAX_SPEED_REVERSE, MAX_SPEED_FORWARD);
-
+  
+  Serial.println(right_speed);
+  Serial.println(left_speed);
   //write the speed set point to the motors
   Joint.left.writeVelocitySetpoint(right_speed, 0);
   Joint.right.writeVelocitySetpoint(left_speed, 0);
@@ -222,6 +231,18 @@ bool RoveDifferentialJointBrushless::atTwistLimit(int drive_speed, uint32_t curr
     return false;
   }
 }
+
+float moveToPos(float currentTilt, float goalTilt, float currentTwist, float goalTwist)
+{
+  float outputTilt, outputTwist;
+  
+
+
+
+
+  return outputTilt, outputTwist;
+}
+
 
 //Calculate position value from given angle
 int RoveDifferentialJointBrushless::getPositionCount(float angle) 

@@ -39,6 +39,7 @@ class RoveDifferentialJointBrushless
     const int MAX_SPEED_FORWARD;
 
     const int ENC_CPR = 8192; //Encoder counts per motor, should only change if we change encoder type
+    const int MAX_ENCODER_ANGLE = 360 //Change if we use radians or smth
     const int GEAR_RATIO;
 
     RoveUsDigiMa3Pwm TiltEncoder;
@@ -56,8 +57,13 @@ class RoveDifferentialJointBrushless
     int right_limit = 0;
 
     RoveDifferentialJointBrushless(int gear_ratio, int max_forward, int max_reverse);
+
     //Attach
     void attachJoint(HardwareSerial* odrive_serial, uint8_t tilt_encoder_pin, uint8_t twist_encoder_pin);
+
+    //Attach PID 
+    void attachTiltPID(float min_output, float max_output, float kp, float ki, float kd);
+    void attachTwistPID(float min_output, float max_output, float kp, float ki, float kd);
 
     //Limit Switch Handling
     void attachLimitSwitches(uint8_t upper_pin, uint8_t lower_pin);
@@ -79,6 +85,7 @@ class RoveDifferentialJointBrushless
     bool atTiltLimit(int drive_speed);
     bool atTwistLimit(int drive_speed, uint32_t current_angle);
     int getPositionCount(float angle);
+    float moveToPos(float currentTilt, float goalTilt, float currentTwist, float goalTwist);
     //TODO: move_to_position wrapper based off of commanded positions and absolute/incremental encoder output
     
     //Move the arm 
