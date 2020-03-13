@@ -1,11 +1,14 @@
 //MRDT Differential Joint 2020
 #include "RoveDifferentialJointBrushless.h"
 
-RoveDifferentialJointBrushless::RoveDifferentialJointBrushless(int gear_ratio, int max_forward, int max_reverse):
-  GEAR_RATIO(gear_ratio), MAX_SPEED_FORWARD(max_forward), MAX_SPEED_REVERSE(max_reverse) {}
+RoveDifferentialJointBrushless::RoveDifferentialJointBrushless(int gear_ratio, int max_forward, int max_reverse, float PID_tolerance):
+  GEAR_RATIO(gear_ratio), MAX_SPEED_FORWARD(max_forward), MAX_SPEED_REVERSE(max_reverse), PID_TOLERANCE(PID_tolerance) {}
 
 //Setups the Joint with necessary pins and constants
-void RoveDifferentialJointBrushless::attachJoint(HardwareSerial* odrive_serial, uint8_t tilt_encoder_pin, uint8_t twist_encoder_pin) 
+void RoveDifferentialJointBrushless::attachJoint(HardwareSerial* odrive_serial, uint8_t tilt_encoder_pin, uint8_t twist_encoder_pin, 
+                 float min_output_tilt, float max_output_tilt, float kp_tilt, float ki_tilt, float kd_tilt,
+                 float min_output_twist, float max_output_twist, float kp_twist, float ki_twist, float kd_twist
+                )
 {
   
   //attach the encoder pins
@@ -15,9 +18,11 @@ void RoveDifferentialJointBrushless::attachJoint(HardwareSerial* odrive_serial, 
   //start the odrive serial communication
   Joint.begin(odrive_serial);
 
-  //set the odrive state to closed loop control
-  Joint.right.writeState(AXIS_STATE_CLOSED_LOOP_CONTROL);
-  Joint.left.writeState(AXIS_STATE_CLOSED_LOOP_CONTROL);
+  TiltPid.attach(min_output_tilt, max_output_tilt, kp_tilt, ki_tilt, kd_tilt);
+  TwistPid.attach(min_output_twist, max_output_twist, kp_twist, ki_twist, kd_twist);
+
+  tiltAngle = getTiltAngleAbsolute();
+  twistAngle = getTwistAngleAbsolute();
 
 }
 
@@ -90,14 +95,48 @@ JointError RoveDifferentialJointBrushless::handleError()
 }
 
 //Get absolute angles 
-float RoveDifferentialJointBrushless::getTiltAngle()
+float RoveDifferentialJointBrushless::getTiltAngleAbsolute()
 {
   return TiltEncoder.readDegrees();
 }
 
-float RoveDifferentialJointBrushless::getTwistAngle()
+float RoveDifferentialJointBrushless::getTwistAngleAbsolute()
 {
   return TwistEncoder.readDegrees();
+}
+
+float RoveDifferentialJointBrushless::getTiltAngle() 
+{
+  return tiltAngle;
+}
+
+float RoveDifferentialJointBrushless::getTwistAngle()
+{
+  return twistAngle;
+}
+
+void RoveDifferentialJointBrushless::getIncrementedAngles(float incrementedAngles[2])
+{
+  //0 is tilt, 1 is twist
+  float leftEncCountsDelta, rightEncCountsDelta;
+  float leftEncCounts = Joint.left.readPosEstimate();
+  float rightEncCounts = Joint.right.readPosEstimate();
+
+  //To get the relative angle moved we first find the change in the encoder counts  
+  leftEncCountsDelta = abs(leftEncCounts - leftEncCountsSetpoint);
+  rightEncCountsDelta = abs(rightEncCounts - rightEncCountsSetpoint);
+
+  //Next we apply a ratio to convert from left and right counts to tilt and twist angles
+  incrementedAngles[0] = ( ( (leftEncCountsDelta + rightEncCountsDelta) / 2) / ANGLE_TO_ENC_COUNTS);
+  incrementedAngles[1] = ( ( (leftEncCountsDelta - rightEncCountsDelta) / 2) / ANGLE_TO_ENC_COUNTS);
+
+  //Now we add the relative angles to the previous angles to get our new value
+  incrementedAngles[0] += tiltAngle;
+  incrementedAngles[1] += twistAngle;
+ 
+  //Last the new encoder positions are moved to be the current setpoints
+  leftEncCountsSetpoint = leftEncCounts;
+  rightEncCountsSetpoint = rightEncCounts;
 }
 
 //Limit Switch initalization and accessor functions
@@ -125,16 +164,6 @@ void RoveDifferentialJointBrushless::setTwistLimits(int left_lim, int right_lim)
 {
   left_limit = left_lim;
   right_limit = right_lim;
-}
-
-void RoveDifferentialJointBrushless::attachTiltPID(float min_output, float max_output, float kp, float ki, float kd)
-{
-  TiltPid.attach(min_output, max_output, kp, ki, kd);
-}
-
-void RoveDifferentialJointBrushless::attachTwistPID(float min_output, float max_output, float kp, float ki, float kd)
-{
-  TwistPid.attach(min_output, max_output, kp, ki, kd);
 }
 
 //Scale our motor speeds so we can do a simultaneous twist and tilt
@@ -232,50 +261,42 @@ bool RoveDifferentialJointBrushless::atTwistLimit(int drive_speed, uint32_t curr
   }
 }
 
-float moveToPos(float currentTilt, float goalTilt, float currentTwist, float goalTwist)
+void RoveDifferentialJointBrushless::moveToPos(float goalTiltAngle, float goalTwistAngle, float outputAngles[2])
 {
-  float outputTilt, outputTwist;
-  
+  float goalAngles[2] = {goalTiltAngle, goalTwistAngle};
+  float currentAngles[2] = {};
+  float smallerAngle, largerAngle;
+  float clockWiseAngle, counterClockWiseAngle;
 
+  getIncrementedAngles(currentAngles);
 
+  //The goal of this program is to find the fastest path to our goal. Due
+  //to stupidity, the ik software gets weird around the 0 angle. So we check 
+  //if going clockwise is quicker than counterclockwise or vise versa. 
 
+  //Do tilt first, then calculate twist
+  for(int i = 0; i <= 1; i++) 
+  {
+    smallerAngle = min(currentAngles[i], goalAngles[i]);
+    largerAngle = max(currentAngles[i], goalAngles[i]);
 
-  return outputTilt, outputTwist;
+    clockWiseAngle = (largerAngle - smallerAngle);
+    counterClockWiseAngle = (smallerAngle - largerAngle);
+
+    if(clockWiseAngle > abs(counterClockWiseAngle))
+    {
+      outputAngles[i] = counterClockWiseAngle;
+    }
+    else 
+    {
+      outputAngles[i] = clockWiseAngle;
+    }
+      outputAngles[i] *= ANGLE_TO_ENC_COUNTS;
+  }
 }
-
 
 //Calculate position value from given angle
 int RoveDifferentialJointBrushless::getPositionCount(float angle) 
 {
   return(abs( (angle*ENC_CPR) / (GEAR_RATIO*2*M_PI )) );
-}
-
-
-
-//Move the arm based on position control from odrives
-void RoveDifferentialJointBrushless::posMoveTilt(float tilt_angle_relative, float tilt_velocity)
-{
-  int positionCount = getPositionCount(tilt_angle_relative);
-  //Tilt, so both motors should go same direction
-  if(tilt_angle_relative < 0) 
-  {
-    tilt_velocity *= -1;
-  }
-  Joint.left.writePosSetPoint(positionCount, tilt_velocity, 0);
-  Joint.right.writePosSetPoint(positionCount, tilt_velocity, 0);
-}
-
-void RoveDifferentialJointBrushless::posMoveTwist(float twist_angle_relative, float twist_velocity)
-{
-  float oppositeVelocity = twist_velocity * -1;
-  int positionCount = getPositionCount(twist_angle_relative);
-  if(twist_angle_relative  < 0) 
-  {
-    Joint.left.writePosSetPoint(positionCount, oppositeVelocity, 0);
-    Joint.right.writePosSetPoint(positionCount, twist_velocity, 0);
-  }
-  else {
-    Joint.left.writePosSetPoint(positionCount, twist_velocity, 0);
-    Joint.right.writePosSetPoint(positionCount, oppositeVelocity, 0);
-  }
 }

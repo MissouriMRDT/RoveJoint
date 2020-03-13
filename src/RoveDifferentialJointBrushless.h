@@ -39,8 +39,12 @@ class RoveDifferentialJointBrushless
     const int MAX_SPEED_FORWARD;
 
     const int ENC_CPR = 8192; //Encoder counts per motor, should only change if we change encoder type
-    const int MAX_ENCODER_ANGLE = 360 //Change if we use radians or smth
+    const float MAX_ENCODER_ANGLE = 360; //Change if we use radians or smth
     const int GEAR_RATIO;
+
+    const int ANGLE_TO_ENC_COUNTS = ((ENC_CPR * GEAR_RATIO ) / MAX_ENCODER_ANGLE);
+
+    const float PID_TOLERANCE;
 
     RoveUsDigiMa3Pwm TiltEncoder;
     RoveUsDigiMa3Pwm TwistEncoder;
@@ -56,14 +60,19 @@ class RoveDifferentialJointBrushless
     int left_limit = 0;
     int right_limit = 0;
 
-    RoveDifferentialJointBrushless(int gear_ratio, int max_forward, int max_reverse);
+    float twistAngle = 0;
+    float tiltAngle = 0;
 
-    //Attach
-    void attachJoint(HardwareSerial* odrive_serial, uint8_t tilt_encoder_pin, uint8_t twist_encoder_pin);
+    float leftEncCountsSetpoint = 0;
+    float rightEncCountsSetpoint = 0;
 
-    //Attach PID 
-    void attachTiltPID(float min_output, float max_output, float kp, float ki, float kd);
-    void attachTwistPID(float min_output, float max_output, float kp, float ki, float kd);
+    RoveDifferentialJointBrushless(int gear_ratio, int max_forward, int max_reverse, float PID_tolerance);
+
+    //Attach Joint
+    void attachJoint(HardwareSerial* odrive_serial, uint8_t tilt_encoder_pin, uint8_t twist_encoder_pin, 
+                     float min_output_tilt, float max_output_tilt, float kp_tilt, float ki_tilt, float kd_tilt,
+                     float min_output_twist, float max_output_twist, float kp_twist, float ki_twist, float kd_twist
+                    );
 
     //Limit Switch Handling
     void attachLimitSwitches(uint8_t upper_pin, uint8_t lower_pin);
@@ -73,10 +82,20 @@ class RoveDifferentialJointBrushless
     //sets angle limits to use as hardstops for movement on an axis without limit switches
     void setTwistLimits(int left_lim, int right_lim);
 
+    //Set both motors into closed loop
+    void setClosedLoop();
+
+    //Use incremental encoders to get angle 
+    void getIncrementedAngles(float incrementedAngles[2]);
+
     //Handle ODrive errors 
     JointError handleError();
 
-    //Get absolute angles 
+    //Get angles from absolute encoders
+    float getTiltAngleAbsolute();
+    float getTwistAngleAbsolute();
+
+    //Get the twist and tilt angles 
     float getTiltAngle();
     float getTwistAngle();
 
@@ -85,13 +104,8 @@ class RoveDifferentialJointBrushless
     bool atTiltLimit(int drive_speed);
     bool atTwistLimit(int drive_speed, uint32_t current_angle);
     int getPositionCount(float angle);
-    float moveToPos(float currentTilt, float goalTilt, float currentTwist, float goalTwist);
+    void moveToPos(float goalTilt, float goalTwist, float outputAngles[2]);
     //TODO: move_to_position wrapper based off of commanded positions and absolute/incremental encoder output
-    
-    //Move the arm 
-    //Don't pass 0 angle value
-    void posMoveTilt(float tilt_angle_relative, float tilt_velocity);
-    void posMoveTwist(float twist_angle_relative, float twist_velocity);
 
     //Encoder Handling
     bool TwistEncoderDisconnect();
@@ -100,3 +114,11 @@ class RoveDifferentialJointBrushless
 };
 
 #endif // ROVE_DIFF
+
+/*
+Flag for tilt twist 
+
+
+
+
+*/
