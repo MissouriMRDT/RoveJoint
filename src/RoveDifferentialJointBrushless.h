@@ -42,7 +42,7 @@ class RoveDifferentialJointBrushless
     const float MAX_ENCODER_ANGLE = 360; //Change if we use radians or smth
     const int GEAR_RATIO;
 
-    const int ANGLE_TO_ENC_COUNTS = ((ENC_CPR * GEAR_RATIO ) / MAX_ENCODER_ANGLE);
+    const int ANGLE_TO_ENC_COUNTS = ( (ENC_CPR) / (MAX_ENCODER_ANGLE * MAX_ENCODER_ANGLE));
 
     const float PID_TOLERANCE;
 
@@ -99,13 +99,11 @@ class RoveDifferentialJointBrushless
     float getTiltAngle();
     float getTwistAngle();
 
+    void rehomePosition();
+
     //Calculations
     void tiltTwistDecipercent(int tilt_decipercent, int twist_decipercent);
-    bool atTiltLimit(int drive_speed);
-    bool atTwistLimit(int drive_speed, uint32_t current_angle);
-    int getPositionCount(float angle);
-    void moveToPos(float goalTilt, float goalTwist, float outputAngles[2]);
-    //TODO: move_to_position wrapper based off of commanded positions and absolute/incremental encoder output
+    void moveToPos(float goalTilt, float goalTwist, float outputCounts[2]);
 
     //Encoder Handling
     bool TwistEncoderDisconnect();
@@ -114,11 +112,3 @@ class RoveDifferentialJointBrushless
 };
 
 #endif // ROVE_DIFF
-
-/*
-Flag for tilt twist 
-
-
-
-
-*/

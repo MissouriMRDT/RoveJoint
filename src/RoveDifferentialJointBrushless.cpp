@@ -52,46 +52,6 @@ void RoveDifferentialJointBrushless::setTwistLimits(int left_lim, int right_lim)
   right_limit = right_lim;
 }
 
-//Returns whether we are moving past our limit switches
-bool RoveDifferentialJointBrushless::atTiltLimit(int drive_speed)
-{
-  //if we are trying to move downwards, and we are hitting the lower limit switch stop
-  //the limit is hit if the switch is no longer being pressed
-  if(drive_speed > 0 && !isLowerLSPressed())
-  {
-    return true;
-  }
-  //if we are trying to move upwards, and we are hitting the upper limit switch stop
-  //the limit is hit if the switch is no longer being pressed
-  else if(drive_speed < 0 && !isUpperLSPressed())
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
-}
-
-//Returns whether we are moving past our angle limits
-bool RoveDifferentialJointBrushless::atTwistLimit(int drive_speed, uint32_t current_angle)
-{
-  //if we are driving to the left, and we are past the limits
-  if(drive_speed < 0 && (current_angle <= left_limit && current_angle > 180000))
-  {
-    return true;
-  }
-  //if we are driving to the right, and we are past the limits
-  else if(drive_speed > 0 && (current_angle >= right_limit && current_angle < 180000))
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
-}
-
 //Get absolute angles 
 float RoveDifferentialJointBrushless::getTiltAngleAbsolute()
 {
@@ -199,10 +159,11 @@ void RoveDifferentialJointBrushless::tiltTwistDecipercent(int tilt_decipercent, 
   //return handleError();
 }
 
-void RoveDifferentialJointBrushless::moveToPos(float goalTiltAngle, float goalTwistAngle, float outputAngles[2])
+void RoveDifferentialJointBrushless::moveToPos(float goalTiltAngle, float goalTwistAngle, float outputCounts[2])
 {
   float goalAngles[2] = {goalTiltAngle, goalTwistAngle};
   float currentAngles[2] = {};
+  float outputAngles[2] = {};
   float smallerAngle, largerAngle;
   float clockWiseAngle, counterClockWiseAngle;
 
@@ -230,13 +191,12 @@ void RoveDifferentialJointBrushless::moveToPos(float goalTiltAngle, float goalTw
       outputAngles[i] = clockWiseAngle;
     }
       outputAngles[i] *= ANGLE_TO_ENC_COUNTS;
+      goalAngles[i] *= ANGLE_TO_ENC_COUNTS;
   }
-}
 
-//Calculate position value from given angle
-int RoveDifferentialJointBrushless::getPositionCount(float angle) 
-{
-  return(abs( (angle*ENC_CPR) / (GEAR_RATIO*2*M_PI )) );
+  outputCounts[0] = TiltPid.incrementPid(goalAngles[0],outputAngles[0],PID_TOLERANCE);
+  outputCounts[1] = TwistPid.incrementPid(goalAngles[1],outputAngles[1],PID_TOLERANCE);
+
 }
 
 //Handle various ODrive errors, and report them
