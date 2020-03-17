@@ -78,14 +78,14 @@ void RoveDifferentialJointBrushless::rehomePosition()
 {
   tiltAngle = getTiltAngleAbsolute();
   twistAngle = getTwistAngleAbsolute();
-  leftEncCountsSetpoint = Joint.left.readPosEstimate();
-  rightEncCountsSetpoint = Joint.right.readPosEstimate();
+  leftLastKnownEncCount = Joint.left.readPosEstimate();
+  rightLastKnownEncCount = Joint.right.readPosEstimate();
 }
 
 void RoveDifferentialJointBrushless::getIncrementedAngles(float incrementedAngles[2])
 {
   //0 is tilt, 1 is twist
-  float leftEncCountsDelta, rightEncCountsDelta;
+  float leftLastKnownEncCount, rightLastKnownEncCount;
   float leftEncCounts = Joint.left.readPosEstimate();
   float rightEncCounts = Joint.right.readPosEstimate();
 
@@ -102,8 +102,8 @@ void RoveDifferentialJointBrushless::getIncrementedAngles(float incrementedAngle
   incrementedAngles[1] += twistAngle;
  
   //Last the new encoder positions are moved to be the current setpoints
-  leftEncCountsSetpoint = leftEncCounts;
-  rightEncCountsSetpoint = rightEncCounts;
+  leftLastKnownEncCount = leftEncCounts;
+  rightLastKnownEncCount = rightEncCounts;
 }
 
 //Scale our motor speeds so we can do a simultaneous twist and tilt
@@ -169,9 +169,9 @@ void RoveDifferentialJointBrushless::moveToPos(float goalTiltAngle, float goalTw
 
   getIncrementedAngles(currentAngles);
 
-  //The goal of this program is to find the fastest path to our goal. Due
-  //to stupidity, the ik software gets weird around the 0 angle. So we check 
-  //if going clockwise is quicker than counterclockwise or vise versa. 
+  //The goal of this program is to find the fastest path to our goal. we 
+  //check whether going around clockwise or counterclockwise is closer to 
+  //the setpoint.
 
   //Do tilt first, then calculate twist
   for(int i = 0; i <= 1; i++) 

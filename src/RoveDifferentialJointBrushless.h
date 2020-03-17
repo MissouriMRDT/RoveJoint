@@ -42,7 +42,7 @@ class RoveDifferentialJointBrushless
     const float MAX_ENCODER_ANGLE = 360; //Change if we use radians or smth
     const int GEAR_RATIO;
 
-    const int ANGLE_TO_ENC_COUNTS = ( (ENC_CPR) / (MAX_ENCODER_ANGLE * MAX_ENCODER_ANGLE));
+    const int ANGLE_TO_ENC_COUNTS = ( (ENC_CPR * GEAR_RATIO) / (MAX_ENCODER_ANGLE));
 
     const float PID_TOLERANCE;
 
@@ -63,8 +63,8 @@ class RoveDifferentialJointBrushless
     float twistAngle = 0;
     float tiltAngle = 0;
 
-    float leftEncCountsSetpoint = 0;
-    float rightEncCountsSetpoint = 0;
+    float leftLastKnownEncCount = 0;
+    float rightLastKnownEncCount = 0;
 
     RoveDifferentialJointBrushless(int gear_ratio, int max_forward, int max_reverse, float PID_tolerance);
 
