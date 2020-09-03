@@ -82,6 +82,7 @@ void RoveDifferentialJointBrushless::rehomePosition()
   rightLastKnownEncCount = Joint.right.readPosEstimate();
 }
 
+/*
 void RoveDifferentialJointBrushless::getIncrementedAngles(float incrementedAngles[2])
 {
   //0 is tilt, 1 is twist
@@ -90,8 +91,8 @@ void RoveDifferentialJointBrushless::getIncrementedAngles(float incrementedAngle
   float rightEncCounts = Joint.right.readPosEstimate();
 
   //To get the relative angle moved we first find the change in the encoder counts  
-  leftEncCountsDelta = (leftEncCounts - leftEncCountsSetpoint);
-  rightEncCountsDelta = (rightEncCounts - rightEncCountsSetpoint);
+  //int leftEncCountsDelta = (leftEncCounts - leftEncCountsSetpoint);
+  //int rightEncCountsDelta = (rightEncCounts - rightEncCountsSetpoint);
 
   //Next we apply a ratio to convert from left and right counts to tilt and twist angles
   incrementedAngles[0] = ( ( (leftEncCountsDelta + rightEncCountsDelta) / 2) / ANGLE_TO_ENC_COUNTS);
@@ -101,10 +102,11 @@ void RoveDifferentialJointBrushless::getIncrementedAngles(float incrementedAngle
   incrementedAngles[0] += tiltAngle;
   incrementedAngles[1] += twistAngle;
  
-  //Last the new encoder positions are moved to be the current setpoints
+  //Lastly, the new encoder positions are moved to be the current setpoints
   leftLastKnownEncCount = leftEncCounts;
   rightLastKnownEncCount = rightEncCounts;
 }
+*/
 
 //Scale our motor speeds so we can do a simultaneous twist and tilt
 void RoveDifferentialJointBrushless::tiltTwistDecipercent(int tilt_decipercent, int twist_decipercent)
