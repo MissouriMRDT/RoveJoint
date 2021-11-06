@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// MRDT Differential Joint 2022
+// MRDT Differential Joint 2019
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef ROVE_BRUSHED
-#define ROVE_BRUSHED
+#ifndef ROVE_DIFF_BRUSHED
+#define ROVE_DIFF_BRUSHED
 
 #include "RoveStmVnhPwm.h"
 #include "RoveUsDigiMa3Pwm.h"
@@ -13,25 +13,27 @@
 
 #include <stdint.h>
 
-#define MAX_POS_ERROR 5 //Maximum error in the position of the joint (in degrees)
-
-class RoveJointBrushed
+class RoveDifferentialJointBrushed
 {
   public:
 
-    RoveStmVnhPwm Motor;
+    RoveStmVnhPwm RightMotor;
+    RoveStmVnhPwm LeftMotor;
 
-    RoveUsDigiMa3Pwm Encoder;
+    RoveUsDigiMa3Pwm TiltEncoder;
+    RoveUsDigiMa3Pwm TwistEncoder;
 
-    RovePidFloats Pid;
+    RovePidFloats TiltPid;
+    RovePidFloats TwistPid;
+
+    enum comp_side {None, Left, Right};
 
     uint8_t LS_UPPER = INVALID;
     uint8_t LS_LOWER = INVALID;
 
-    int up_limit = 0;
-    int low_limit = 0;
+    int left_limit = 0;
+    int right_limit = 0;
 
-    void attachJoint(uint8_t encoder_pin);
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Limit Switch Handling
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,20 +41,20 @@ class RoveJointBrushed
     //returns whether or not the Limit switch is pressed (if we are moving past that given limit)
     bool isLowerLSPressed();
     bool isUpperLSPressed();
-    void setJointLimits(int up_lim, int low_lim);
+    void setTwistLimits(int left_lim, int right_lim);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Calculations
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    void jointDecipercent( int joint_decipercent);
-    bool atJointLimit(int drive_speed);
-    float getJointAngle();
-    void moveToPos(float goal);
+    void tiltTwistDecipercent( int tilt_decipercent, int twist_decipercent, comp_side compensation = None, float comp_factor=1.0);
+    bool atTiltLimit(int drive_speed);
+    bool atTwistLimit(int drive_speed, uint32_t current_angle);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Encoder Handling
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    bool JointEncoderDisconnect();
+    bool TwistEncoderDisconnect();
+    bool TiltEncoderDisconnect();
 
 };
 
