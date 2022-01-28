@@ -8,16 +8,16 @@ void setup()
   delay(100);
 
   Shoulder.LeftMotor.attach(SHOULDER_LEFT_INA, SHOULDER_LEFT_INB, SHOULDER_LEFT_PWM);
-  Shoulder.RightMotor.attach(SHOULDER_RIGHT_INA, SHOULDER_RIGHT_INB, SHOULDER_RIGHT_PWM);
+  Shoulder.rightMotor.attach(SHOULDER_RIGHT_INA, SHOULDER_RIGHT_INB, SHOULDER_RIGHT_PWM);
   Elbow.LeftMotor.attach(ELBOW_LEFT_INA, ELBOW_LEFT_INB, ELBOW_LEFT_PWM);
-  Elbow.RightMotor.attach(ELBOW_RIGHT_INA, ELBOW_RIGHT_INB, ELBOW_RIGHT_PWM);
+  Elbow.rightMotor.attach(ELBOW_RIGHT_INA, ELBOW_RIGHT_INB, ELBOW_RIGHT_PWM);
 
-  Shoulder.TiltEncoder.attach(SHOULDER_TILT_ENCODER,false,7,250200); //offsets to have arm pointing straight up
+  Shoulder.tiltEncoder.attach(SHOULDER_TILT_ENCODER,false,7,250200); //offsets to have arm pointing straight up
   Shoulder.TwistEncoder.attach(SHOULDER_TWIST_ENCODER,false,7,247680);
   Shoulder.attachLimitSwitches(LS_1, LS_2);
   Shoulder.setTwistLimits(295000,57000);
 
-  Elbow.TiltEncoder.attach(ELBOW_TILT_ENCODER,false,7,82800);
+  Elbow.tiltEncoder.attach(ELBOW_TILT_ENCODER,false,7,82800);
   Elbow.TwistEncoder.attach(ELBOW_TWIST_ENCODER,false,7,244800);
   Elbow.attachLimitSwitches(LS_4, LS_7);
 
@@ -29,19 +29,19 @@ void setup()
   pinMode(SW_IND_1, OUTPUT);
 
   Shoulder.LeftMotor.drive(0);
-  Shoulder.RightMotor.drive(0);
-  Shoulder.TiltEncoder.start();
+  Shoulder.rightMotor.drive(0);
+  Shoulder.tiltEncoder.start();
   Shoulder.TwistEncoder.start();
 
   Elbow.LeftMotor.drive(0);
-  Elbow.RightMotor.drive(0);
-  Elbow.TiltEncoder.start();
+  Elbow.rightMotor.drive(0);
+  Elbow.tiltEncoder.start();
   Elbow.TwistEncoder.start();
 
-  Elbow.TiltPid.attach( -300.0, 300.0, 27, 0, 0);
+  Elbow.tiltPid.attach( -300.0, 300.0, 27, 0, 0);
   Elbow.TwistPid.attach( -300.0, 300.0, 15.0, 0, 0 );
 
-  Shoulder.TiltPid.attach( -700.0, 400.0, 20.0, 0, 0 );
+  Shoulder.tiltPid.attach( -700.0, 400.0, 20.0, 0, 0 );
   Shoulder.TwistPid.attach( -600.0, 600.0, 20.0, 0, 0 );
 
   Watchdog.attach(stop);
@@ -67,23 +67,23 @@ void loop()
 void stop()
 {
   Elbow.LeftMotor.drive(0);
-  Elbow.RightMotor.drive(0);
+  Elbow.rightMotor.drive(0);
   Shoulder.LeftMotor.drive(0);
-  Shoulder.RightMotor.drive(0);
+  Shoulder.rightMotor.drive(0);
   Wrist.LeftMotor.drive(0);
-  Wrist.RightMotor.drive(0);
+  Wrist.rightMotor.drive(0);
   Watchdog.clear();
 }
 
 
 void updatePosition()
 {
-   jointAngles[0] = Shoulder.TwistEncoder.readMillidegrees();
-   jointAngles[1] = Shoulder.TiltEncoder.readMillidegrees();
-   jointAngles[2] = Elbow.TiltEncoder.readMillidegrees();
-   jointAngles[3] = Elbow.TwistEncoder.readMillidegrees();
-   jointAngles[4] = Elbow.TiltEncoder.readMillidegrees();
-   jointAngles[5] = Elbow.TwistEncoder.readMillidegrees();
+   jointAngles[0] = Shoulder.TwistEncoder.readDegrees();
+   jointAngles[1] = Shoulder.tiltEncoder.readDegrees();
+   jointAngles[2] = Elbow.tiltEncoder.readDegrees();
+   jointAngles[3] = Elbow.TwistEncoder.readDegrees();
+   jointAngles[4] = Elbow.tiltEncoder.readDegrees();
+   jointAngles[5] = Elbow.TwistEncoder.readDegrees();
    if(millis()-last_update_time >= ROVECOMM_UPDATE_RATE)
   {
       RoveComm.write(RC_ARMBOARD_JOINTANGLES_DATA_ID, RC_ARMBOARD_JOINTANGLES_DATA_COUNT, jointAngles);
@@ -124,13 +124,13 @@ void openLoop()
   Serial.print("3:");Serial.println(packet.data[2]);
   Serial.print("4:");Serial.println(packet.data[3]);
       
-  if(Shoulder.atTiltLimit(packet.data[1]) && do_ls)
+  if(Shoulder.atTiltHardLimit(packet.data[1]) && do_ls)
   {
     Serial.println("Bicep Limit");
     packet.data[1] = 0;
   }
 
-  if(Elbow.atTiltLimit(packet.data[2]) && do_ls)
+  if(Elbow.atTiltHardLimit(packet.data[2]) && do_ls)
   {
     Serial.println("Elbow Limit");
     packet.data[2] = 0;
@@ -138,20 +138,20 @@ void openLoop()
   
   if(packet.data[1] >= 0)
   {
-    Shoulder.tiltTwistDecipercent((packet.data[1]), (packet.data[0]));
+    Shoulder.tiltTwistDrive((packet.data[1]), (packet.data[0]));
   }
   else if(packet.data[1] <= 0)
   {
-    Shoulder.tiltTwistDecipercent((packet.data[1])*2/3, (packet.data[0])*2/3);
+    Shoulder.tiltTwistDrive((packet.data[1])*2/3, (packet.data[0])*2/3);
   }
 
   if(packet.data[0] >= 0)
   {
-    Shoulder.tiltTwistDecipercent((packet.data[1]), (packet.data[0]));
+    Shoulder.tiltTwistDrive((packet.data[1]), (packet.data[0]));
   }
   else if(packet.data[0] <= 0)
   {
-    Shoulder.tiltTwistDecipercent((packet.data[1]), (packet.data[0]));
+    Shoulder.tiltTwistDrive((packet.data[1]), (packet.data[0]));
   }
 
   ///////////////////////////////////////////////////////////////////////////////////
@@ -159,19 +159,19 @@ void openLoop()
   ///////////////////////////////////////////////////////////////////////////////////
   if(packet.data[2] >= 0)
   {
-      Elbow.tiltTwistDecipercent((packet.data[2])*2/3, (packet.data[3])*2/3);
+      Elbow.tiltTwistDrive((packet.data[2])*2/3, (packet.data[3])*2/3);
   }
   else if(packet.data[2] <= 0)
   {
-      Elbow.tiltTwistDecipercent((packet.data[2])*1/3, (packet.data[3])*2/3);
+      Elbow.tiltTwistDrive((packet.data[2])*1/3, (packet.data[3])*2/3);
   }
   if(packet.data[3] >= 0)
   {
-      Elbow.tiltTwistDecipercent((packet.data[2])*2/3, (packet.data[3])*2/3);
+      Elbow.tiltTwistDrive((packet.data[2])*2/3, (packet.data[3])*2/3);
   }
   else if(packet.data[3] <= 0)
   {
-      Elbow.tiltTwistDecipercent((packet.data[2])*2/3, (packet.data[3])*2/3);
+      Elbow.tiltTwistDrive((packet.data[2])*2/3, (packet.data[3])*2/3);
   }
   
   Watchdog.clear();

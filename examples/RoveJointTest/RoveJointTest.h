@@ -5,9 +5,9 @@
 #include "RoveComm.h"
 #include "RovePid.h"
 
-RoveJointDifferentialBrushedDC Shoulder;
-RoveJointDifferentialBrushedDC Elbow;
-RoveJointDifferentialBrushedDC Wrist;
+RoveJointDifferential Shoulder;
+RoveJointDifferential Elbow;
+RoveJointDifferential Wrist;
 
 RoveCommEthernet RoveComm;
 RoveWatchdog Watchdog;
