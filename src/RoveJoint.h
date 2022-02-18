@@ -5,6 +5,7 @@
 #ifndef ROVE_JOINT
 #define ROVE_JOINT
 
+#include "Energia.h"
 #include <stdint.h>
 
 #include "RoveStmVnhPwm.h"
