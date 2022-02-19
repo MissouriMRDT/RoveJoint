@@ -2,7 +2,6 @@
 
 #include "RoveComm.h"
 #include "RoveJoint.h"
-#include "RoveWatchdog"
 
 //Motor PWM Pins
 #define MotorPWM_1  PF_1
