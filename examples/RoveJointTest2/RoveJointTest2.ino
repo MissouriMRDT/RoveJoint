@@ -11,10 +11,10 @@ void setup()
     J3.motor_1.attach(MotorINA_3, MotorINB_3, MotorPWM_3);
     J4.motor_1.attach(MotorINA_4, MotorINB_4, MotorPWM_4);
     Gripper.motor_1.attach(MotorINA_5, MotorINB_5, MotorPWM_5);
-    //J1.encoder_1.attach(Encoder_J3,false,7,250200);
+    /*J1.encoder_1.attach(Encoder_J3,false,7,250200);
     //J1.encoder_1.start();
     Watchdog.attach(estop);
-    Watchdog.start(watchdogTimeout);
+    Watchdog.start(watchdogTimeout);*/
 }
 
 void loop()
@@ -33,14 +33,14 @@ void loop()
             RoveComm.writeTo(RC_ARMBOARD_ARMVELOCITYCONTROL_DATA_ID, RC_ARMBOARD_ARMVELOCITYCONTROL_DATA_COUNT,
                             motorSpeeds, RC_ROVECOMM_SUBNET_IP_FIRST_OCTET, RC_ROVECOMM_SUBNET_IP_SECOND_OCTET,
                             RC_ROVECOMM_SUBNET_IP_THIRD_OCTET, RC_MICROPIBOARD_FOURTHOCTET, RC_ROVECOMM_ETHERNET_UDP_PORT);
-            Watchdog.clear();
+            //Watchdog.clear();
             break;
         }
         case RC_ARMBOARD_GRIPPERMOVE_DATA_ID:
         {
             int16_t* gripperSpeed = (int16_t*)packet.data;
             Gripper.DriveMotor(gripperSpeed[0]);
-            Watchdog.clear();
+            //Watchdog.clear();
             break;
         }
         case RC_ARMBOARD_LASERS_DATA_ID:
@@ -50,7 +50,7 @@ void loop()
                             laser, RC_ROVECOMM_SUBNET_IP_FIRST_OCTET, RC_ROVECOMM_SUBNET_IP_SECOND_OCTET,
                             RC_ROVECOMM_SUBNET_IP_THIRD_OCTET, RC_HEATERBOARD_FOURTHOCTET, RC_ROVECOMM_ETHERNET_UDP_PORT);
             
-            Watchdog.clear();
+            //Watchdog.clear();
             break;
         }
         case RC_ARMBOARD_SOLENOID_DATA_ID:
@@ -59,14 +59,14 @@ void loop()
             RoveComm.writeTo(RC_ARMBOARD_SOLENOID_DATA_ID, RC_ARMBOARD_SOLENOID_DATA_COUNT,
                             solenoid, RC_ROVECOMM_SUBNET_IP_FIRST_OCTET, RC_ROVECOMM_SUBNET_IP_SECOND_OCTET,
                             RC_ROVECOMM_SUBNET_IP_THIRD_OCTET, RC_HEATERBOARD_FOURTHOCTET, RC_ROVECOMM_ETHERNET_UDP_PORT);
-            Watchdog.clear();
+            //Watchdog.clear();
             break;
         }
         default:
             break;
     } 
 }
-
+/*
 void estop()
 {
     J1.DriveMotor(0);
@@ -74,4 +74,4 @@ void estop()
     J3.DriveMotor(0);
     J4.DriveMotor(0);
     Watchdog.clear();
-}
+}*/
