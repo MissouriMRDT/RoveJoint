@@ -1,4 +1,4 @@
-#include "RoveJointTest3.h"
+#include "RoveJointTest2.h"
 
 void setup()
 {
@@ -13,8 +13,8 @@ void setup()
     Gripper.motor_1.attach(MotorINA_5, MotorINB_5, MotorPWM_5);
     //J1.encoder_1.attach(Encoder_J3,false,7,250200);
     //J1.encoder_1.start();
-    Watchdog.begin(estop);
-    watchdog.start(watchdogTimeout);
+    Watchdog.attach(estop);
+    Watchdog.start(watchdogTimeout);
 }
 
 void loop()
@@ -23,37 +23,47 @@ void loop()
 
     switch ( packet.data_id )
     {
-    case RC_ARMBOARD_ARMVELOCITYCONTROL_DATA_ID:
-        int16_t* motorSpeeds = (int16_t*)packet.data;
-        J1.DriveMotor(motorSpeeds[0]);
-        J2.DriveMotor(motorSpeeds[1]);
-        J3.DriveMotor(motorSpeeds[2]);
-        J4.DriveMotor(motorSpeeds[3]);
-        RoveComm.writeTo(RC_ARMBOARD_ARMVELOCITYCONTROL_DATA_ID, RC_ARMBOARD_ARMVELOCITYCONTROL_DATA_COUNT,
-                         motorSpeeds, RC_ROVECOMM_SUBNET_IP_FIRST_OCTET, RC_ROVECOMM_SUBNET_IP_SECOND_OCTET,
-                         RC_ROVECOMM_SUBNET_IP_THIRD_OCTET, RC_MICROPIBOARD_FOURTHOCTET, RC_ROVECOMM_ETHERNET_UDP_PORT);
-        Watchdog.clear();
-        break;
-    case RC_ARMBOARD_GRIPPERMOVE_DATA_ID:
-        Gripper.DriveMotor((int16_t)packet.data[0]);
-        Watchdog.clear();
-        break;
-    case RC_ARMBOARD_LASERS_DATA_ID:
-        RoveComm.writeTo(RC_ARMBOARD_LASERS_DATA_ID, RC_ARMBOARD_LASERS_DATA_COUNT,
-                         (uint8_t)packet.data[0], RC_ROVECOMM_SUBNET_IP_FIRST_OCTET, RC_ROVECOMM_SUBNET_IP_SECOND_OCTET,
-                         RC_ROVECOMM_SUBNET_IP_THIRD_OCTET, RC_HEATERBOARD_FOURTHOCTET, RC_ROVECOMM_ETHERNET_UDP_PORT);
-        
-        Watchdog.clear();
-        break;
-    case RC_ARMBOARD_SOLENOID_DATA_ID:
-        RoveComm.writeTo(RC_ARMBOARD_SOLENOID_DATA_ID, RC_ARMBOARD_SOLENOID_DATA_COUNT,
-                         (uint8_t)packet.data[0], RC_ROVECOMM_SUBNET_IP_FIRST_OCTET, RC_ROVECOMM_SUBNET_IP_SECOND_OCTET,
-                         RC_ROVECOMM_SUBNET_IP_THIRD_OCTET, RC_HEATERBOARD_FOURTHOCTET, RC_ROVECOMM_ETHERNET_UDP_PORT);
-        Watchdog.clear();
-        break;
-    default:
-        Serial.println("Whack");
-        break;
+        case RC_ARMBOARD_ARMVELOCITYCONTROL_DATA_ID:
+        {
+            int16_t* motorSpeeds = (int16_t*)packet.data;
+            J1.DriveMotor(motorSpeeds[0]);
+            J2.DriveMotor(motorSpeeds[1]);
+            J3.DriveMotor(motorSpeeds[2]);
+            J4.DriveMotor(motorSpeeds[3]);
+            RoveComm.writeTo(RC_ARMBOARD_ARMVELOCITYCONTROL_DATA_ID, RC_ARMBOARD_ARMVELOCITYCONTROL_DATA_COUNT,
+                            motorSpeeds, RC_ROVECOMM_SUBNET_IP_FIRST_OCTET, RC_ROVECOMM_SUBNET_IP_SECOND_OCTET,
+                            RC_ROVECOMM_SUBNET_IP_THIRD_OCTET, RC_MICROPIBOARD_FOURTHOCTET, RC_ROVECOMM_ETHERNET_UDP_PORT);
+            Watchdog.clear();
+            break;
+        }
+        case RC_ARMBOARD_GRIPPERMOVE_DATA_ID:
+        {
+            int16_t* gripperSpeed = (int16_t*)packet.data;
+            Gripper.DriveMotor(gripperSpeed[0]);
+            Watchdog.clear();
+            break;
+        }
+        case RC_ARMBOARD_LASERS_DATA_ID:
+        {
+            uint8_t* laser = (uint8_t*)packet.data;
+            RoveComm.writeTo(RC_ARMBOARD_LASERS_DATA_ID, RC_ARMBOARD_LASERS_DATA_COUNT,
+                            laser, RC_ROVECOMM_SUBNET_IP_FIRST_OCTET, RC_ROVECOMM_SUBNET_IP_SECOND_OCTET,
+                            RC_ROVECOMM_SUBNET_IP_THIRD_OCTET, RC_HEATERBOARD_FOURTHOCTET, RC_ROVECOMM_ETHERNET_UDP_PORT);
+            
+            Watchdog.clear();
+            break;
+        }
+        case RC_ARMBOARD_SOLENOID_DATA_ID:
+        {
+            uint8_t* solenoid = (uint8_t*)packet.data;
+            RoveComm.writeTo(RC_ARMBOARD_SOLENOID_DATA_ID, RC_ARMBOARD_SOLENOID_DATA_COUNT,
+                            solenoid, RC_ROVECOMM_SUBNET_IP_FIRST_OCTET, RC_ROVECOMM_SUBNET_IP_SECOND_OCTET,
+                            RC_ROVECOMM_SUBNET_IP_THIRD_OCTET, RC_HEATERBOARD_FOURTHOCTET, RC_ROVECOMM_ETHERNET_UDP_PORT);
+            Watchdog.clear();
+            break;
+        }
+        default:
+            break;
     } 
 }
 

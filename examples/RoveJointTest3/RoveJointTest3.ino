@@ -1,4 +1,4 @@
-#include "RoveJointTest2.h"
+#include "RoveJointTest3.h"
 
 void setup()
 {
@@ -8,8 +8,8 @@ void setup()
     delay(100);
     Wrist.rightMotor.attach(MotorINA_1, MotorINB_1, MotorPWM_1);
     Wrist.LeftMotor.attach(MotorINA_2, MotorINB_2, MotorPWM_2);
-    Watchdog.begin(estop);
-    watchdog.start(2000);
+    Watchdog.attach(estop);
+    Watchdog.start(2000);
 }
 
 void loop()
@@ -18,11 +18,15 @@ void loop()
 
     switch ( packet.data_id )
     {
-    case RC_ARMBOARD_ARMVELOCITYCONTROL_DATA_ID:
-        int16_t* motorSpeeds = (int16_t*)packet.data;
-        Wrist.tiltTwistDrive(motorSpeeds[4], motorSpeeds[5]);
-        break;
-    default:
-        break;
+        case RC_ARMBOARD_ARMVELOCITYCONTROL_DATA_ID:
+            int16_t* motorSpeeds = (int16_t*)packet.data;
+            Wrist.tiltTwistDrive(motorSpeeds[4], motorSpeeds[5]);
+            break;
     }
+}
+
+void estop()
+{
+    Wrist.tiltTwistDrive(0,0);
+    Watchdog.clear();
 }
