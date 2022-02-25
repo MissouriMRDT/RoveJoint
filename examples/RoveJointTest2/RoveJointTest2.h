@@ -23,17 +23,17 @@
 #define MotorINB_1  PE_5
 #define MotorINB_2  PC_7
 #define MotorINB_3  PB_3
-#define MotorINB_4  PG_1
+#define MotorINB_4  PD_5
 #define MotorINB_5  PP_4
 #define MotorINB_6  PN_4
 
 //Joint Encoder Pins
 #define Encoder_J1  PM_1
-#define Encoder_J2  PD_2
-#define Encoder_J3  PD_0
+#define Encoder_J2  PD_4
+#define Encoder_J3  PM_2
 #define Encoder_J4  PD_1
 #define Encoder_J5  PD_7
-#define Encoder_J6  PM_4
+#define Encoder_J6  PM_0
 
 //Limit Switch Pins
 #define LimitSwitchLower_J1  PP_5
@@ -43,14 +43,15 @@
 #define LimitSwitchLower_J3  PL_1
 #define LimitSwitchUpper_J3  PL_3
 
-RoveJoint J1, J2, J3, J4;
+RoveJoint J1, J2, J3, J4, Gripper;
 RoveJointDifferential Wrist;
 
 RoveCommEthernet RoveComm;
+rovecomm_packet packet;
 RoveWatchdog Watchdog;
 EthernetServer TCPServer(RC_ROVECOMM_ARMBOARD_PORT);
 
-const uint16_t watchdogTimeout = 1500;
+const uint16_t watchdogTimeout = 2000;
 
 uint16_t jointAngles[6];
 
