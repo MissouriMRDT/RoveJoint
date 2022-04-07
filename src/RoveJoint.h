@@ -18,11 +18,11 @@ class RoveJoint
 {
     public:
 
-        RoveStmVnhPwm motor_1;
+        RoveStmVnhPwm motor;
 
-        RoveUsDigiMa3Pwm encoder_1;
+        RoveUsDigiMa3Pwm encoder;
 
-        RovePidFloats pid_1;
+        RovePidFloats pid;
 
         uint8_t limitSwitch_1 = INVALID;
         uint8_t limitSwitch_2 = INVALID;
@@ -54,20 +54,20 @@ class RoveJointDifferential : public RoveJoint
 {
     public:
 
-        #define     rightMotor              motor_1
-        #define     tiltEncoder             encoder_1
+        #define     rightMotor              motor
+        #define     tiltEncoder             encoder
         #define     currentTiltAngle        currentAngle
-        #define     tiltPid                 pid_1
+        #define     tiltPid                 pid
         #define     limitSwitchLower        limitSwitch_1
         #define     limitSwitchUpper        limitSwitch_2
         #define     forwardTiltAngleLimit   angleLimit_1
         #define     backwardTiltAngleLimit  angleLimit_2
 
-        RoveStmVnhPwm LeftMotor;
+        RoveStmVnhPwm leftMotor;
 
-        RoveUsDigiMa3Pwm TwistEncoder;
+        RoveUsDigiMa3Pwm twistEncoder;
 
-        RovePidFloats TwistPid;
+        RovePidFloats twistPid;
 
         uint16_t leftTwistAngleLimit = 0;
         uint16_t rightTwistAngleLimit = 0;

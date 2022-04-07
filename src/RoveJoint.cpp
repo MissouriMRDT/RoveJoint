@@ -85,7 +85,7 @@ void RoveJoint::DriveMotor( int16_t driveSpeed )
     {
         driveSpeed = -1000;
     }
-    motor_1.drive( driveSpeed );
+    motor.drive( driveSpeed );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -190,5 +190,5 @@ void RoveJointDifferential::tiltTwistDrive( int16_t tiltSpeed, int16_t twistSpee
     }
 
     rightMotor.drive(right_speed);
-    LeftMotor.drive(left_speed);
+    leftMotor.drive(left_speed);
 }
