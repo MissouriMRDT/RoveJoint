@@ -54,6 +54,12 @@
 #define LimitSwitchLower_J3     PG_1
 #define LimitSwitchUpper_J3     PK_4
 
+// Laser Pin
+#define LaserToggle             PN_2
+
+// Solenoid Pin
+#define SolenoidToggle          PN_3
+
 RoveJoint ShoulderTilt, ShoulderTwist, ElbowTilt, ElbowTwist, Gripper;
 RoveJointDifferential Wrist;
 

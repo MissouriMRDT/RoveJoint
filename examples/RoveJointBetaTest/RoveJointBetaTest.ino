@@ -14,7 +14,7 @@ void setup()
     ShoulderTilt.encoder.attach(Encoder_ShoulderTilt);
     ShoulderTwist.encoder.attach(Encoder_ShoulderTwist);
     ElbowTilt.encoder.attach(Encoder_ElbowTilt);
-    ElbowTilt.encoder.attach(Encoder_ElbowTwist);
+    ElbowTwist.encoder.attach(Encoder_ElbowTwist);
     Wrist.tiltEncoder.attach(Encoder_WristTilt);
     Wrist.twistEncoder.attach(Encoder_WristTwist);
 
@@ -25,22 +25,69 @@ void setup()
     ShoulderTilt.encoder.start();
     ShoulderTwist.encoder.start();
     ElbowTilt.encoder.start();
-    ElbowTilt.encoder.start();
+    ElbowTwist.encoder.start();
     Wrist.tiltEncoder.start();
     Wrist.twistEncoder.start();
 
-
+    Watchdog.attach(estop);
+    WatchdogTelemetry.attach(telemetry);
+    Watchdog.start(watchdogTimeout);
+    WatchdogTelemetry.start(ROVECOMM_UPDATE_RATE);
 }
 
 void loop()
 {
+    packet = RoveComm.read();
 
+    switch ( packet.data_id )
+    {
+        case RC_ARMBOARD_ARMVELOCITYCONTROL_DATA_ID:
+            int16_t* motorSpeeds; 
+            motorSpeeds = (int16_t*)packet.data;
+            ShoulderTilt.DriveMotor(motorSpeeds[0]);
+            ShoulderTwist.DriveMotor(motorSpeeds[1]);
+            ElbowTilt.DriveMotor(motorSpeeds[2]);
+            ElbowTwist.DriveMotor(motorSpeeds[3]);
+            Wrist.tiltTwistDrive(motorSpeeds[4], motorSpeeds[5]);
+            Watchdog.clear();
+            break;
+        case RC_ARMBOARD_LASERS_DATA_ID:
+            if (packet.data[0])
+            {
+                digitalWrite(LaserToggle, HIGH);
+            }
+            else
+            {
+                digitalWrite(LaserToggle, LOW);
+            }
+            Watchdog.clear();
+            break;
+        case RC_ARMBOARD_SOLENOID_DATA_ID:
+            if (packet.data[0])
+            {
+                digitalWrite(SolenoidToggle, HIGH);
+            }
+            else
+            {
+                digitalWrite(SolenoidToggle, LOW);
+            }
+            Watchdog.clear();
+            break;
+        case RC_ARMBOARD_GRIPPERMOVE_DATA_ID:
+            int16_t* gripperSpeed;
+            gripperSpeed = (int16_t*)packet.data;
+            Gripper.DriveMotor(gripperSpeed[0]);
+            Watchdog.clear();
+            break;
+        default;
+    }   
 }
 
-void parsePackets()
+/*void parsePackets()
 {
 
 }
+
 
 void updatePosition()
 {
@@ -50,4 +97,23 @@ void updatePosition()
 void closedLoop()
 {
 
+}
+
+
+void telemetry()
+{
+
+}
+*/
+
+void estop()
+{
+    ShoulderTilt.DriveMotor(0);
+    ShoulderTwist.DriveMotor(0);
+    ElbowTilt.DriveMotor(0);
+    ElbowTwist.DriveMotor(0);
+    Wrist.tiltTwistDrive(0, 0);
+    digitalWrite(LaserToggle, LOW);
+    digitalWrite(SolenoidToggle, LOW);
+    Gripper.DriveMotor(0);
 }
