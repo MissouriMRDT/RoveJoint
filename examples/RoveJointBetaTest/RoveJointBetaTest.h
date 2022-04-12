@@ -6,7 +6,7 @@
 // Motor 1 Pins
 #define MotorINA_1              PC_6
 #define MotorINB_1              PE_5
-#define MotorPWM_1              PH_3
+#define MotorPWM_1              PM_2
 
 // Motor 2 Pins
 #define MotorINA_2              PD_3

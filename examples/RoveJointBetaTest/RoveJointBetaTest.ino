@@ -29,6 +29,8 @@ void setup()
     Wrist.tiltEncoder.start();
     Wrist.twistEncoder.start();
 
+    RoveComm.begin(RC_ARMBOARD_FOURTHOCTET, &TCPServer);
+
     Watchdog.attach(estop);
     WatchdogTelemetry.attach(telemetry);
     Watchdog.start(watchdogTimeout);
