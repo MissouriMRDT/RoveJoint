@@ -6,7 +6,7 @@ void setup()
     ShoulderTilt.motor.attach(MotorINA_1,MotorINB_1,MotorPWM_1);
     ShoulderTwist.motor.attach(MotorINA_2,MotorINB_2,MotorPWM_2);
     ElbowTilt.motor.attach(MotorINA_3,MotorINB_3,MotorPWM_3);
-    ElbowTilt.motor.attach(MotorINA_4,MotorINB_4,MotorPWM_4);
+    ElbowTwist.motor.attach(MotorINA_4,MotorINB_4,MotorPWM_4);
     Wrist.rightMotor.attach(MotorINA_5,MotorINB_5,MotorPWM_5);
     Wrist.leftMotor.attach(MotorINA_6,MotorINB_6,MotorPWM_6);
     Gripper.motor.attach(MotorINA_7,MotorINB_7,MotorPWM_7);
