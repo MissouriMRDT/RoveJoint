@@ -75,6 +75,17 @@ float jointAngles[6];
 
 float jointTargets[6];
 
+float shoulderTiltTarget;
+float shoulderTwistTarget;
+float elbowTiltTarget;
+float elbowTwistTarget;
+float wristTiltTarget;
+float wristTwistTarget;
+
+bool closedloopActive = false;
+
 void parsePackets();
 void updatePosition();
 void closedLoop();
+void movetoAngle(RoveJoint &Joint, float moveTo, float Angle, float output);
+void movetoAngle(RoveJointDifferential &Joint, float tiltTo, float twistTo, float Angles[2], float outputs[2]);
