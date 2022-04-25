@@ -75,7 +75,7 @@ bool RoveJoint::atHardLimit( int16_t driveSpeed )
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // Drives Motor CW/CCW
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-void RoveJoint::DriveMotor( int16_t driveSpeed )
+void RoveJoint::moveJoint( int16_t driveSpeed )
 {
     if ( driveSpeed > 1000 )
     {
@@ -163,7 +163,7 @@ bool RoveJointDifferential::atTwistLimit(int16_t driveSpeed)
   }
 }
 
-void RoveJointDifferential::tiltTwistDrive( int16_t tiltSpeed, int16_t twistSpeed)
+void RoveJointDifferential::moveDiffJoint( int16_t tiltSpeed, int16_t twistSpeed)
 {
     int16_t left_speed  = tiltSpeed - twistSpeed;
     int16_t right_speed = tiltSpeed + twistSpeed;

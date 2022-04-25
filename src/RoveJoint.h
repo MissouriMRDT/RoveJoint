@@ -47,7 +47,7 @@ class RoveJoint
         // Motor Movement
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        void DriveMotor( int16_t driveSpeed );
+        void moveJoint( int16_t driveSpeed );
 };
 
 class RoveJointDifferential : public RoveJoint
@@ -90,7 +90,7 @@ class RoveJointDifferential : public RoveJoint
         bool atTiltSoftLimit(int16_t driveSpeed);
         bool atTiltHardLimit(int16_t driveSpeed);
         bool atTwistLimit(int16_t driveSpeed);
-        void tiltTwistDrive( int16_t tiltSpeed, int16_t twistSpeed);
+        void moveDiffJoint( int16_t tiltSpeed, int16_t twistSpeed);
         
 };
 
