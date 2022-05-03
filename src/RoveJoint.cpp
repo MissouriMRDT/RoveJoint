@@ -88,6 +88,20 @@ void RoveJoint::moveJoint( int16_t driveSpeed )
     motor.drive( driveSpeed );
 }
 
+void RoveJoint::stopJoint( int16_t brakeSpeed )
+{
+    if ( brakeSpeed > 1000 )
+    {
+        brakeSpeed = 1000;
+    }
+    else if ( brakeSpeed < -1000 )
+    {
+        brakeSpeed = -1000;
+    }
+    motor.hardBrake( brakeSpeed );
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MRDT RoveJointDifferential 2022
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -191,4 +205,34 @@ void RoveJointDifferential::moveDiffJoint( int16_t tiltSpeed, int16_t twistSpeed
 
     rightMotor.drive(right_speed);
     leftMotor.drive(left_speed);
+}
+
+void RoveJointDifferential::stopDiffJoint( int16_t tiltSpeed, int16_t twistSpeed)
+{
+    int16_t left_speed  = tiltSpeed - twistSpeed;
+    int16_t right_speed = tiltSpeed + twistSpeed;
+
+    if(left_speed > 1000)
+    {
+        right_speed = right_speed-(left_speed-1000);
+        left_speed = 1000;
+    }
+    else if(left_speed < - 1000)
+    {
+        right_speed = right_speed+(abs(left_speed)-1000);
+        left_speed = -1000;
+    }
+    else if(right_speed > 1000)
+    {
+        left_speed = left_speed-(right_speed-1000);
+        right_speed = 1000;
+    }
+    else if(right_speed < - 1000)
+    {
+        left_speed = left_speed+(abs(right_speed)-1000);
+        right_speed = -1000;
+    }
+
+    rightMotor.hardBrake(right_speed);
+    leftMotor.hardBrake(left_speed);
 }

@@ -48,6 +48,7 @@ class RoveJoint
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
         void moveJoint( int16_t driveSpeed );
+        void stopJoint( int16_t brakeSpeed );
 };
 
 class RoveJointDifferential : public RoveJoint
@@ -91,6 +92,7 @@ class RoveJointDifferential : public RoveJoint
         bool atTiltHardLimit(int16_t driveSpeed);
         bool atTwistLimit(int16_t driveSpeed);
         void moveDiffJoint( int16_t tiltSpeed, int16_t twistSpeed);
+        void stopDiffJoint( int16_t tiltSpeed, int16_t twistSpeed);
         
 };
 
