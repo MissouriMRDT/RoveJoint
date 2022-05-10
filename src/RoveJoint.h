@@ -30,8 +30,6 @@ class RoveJoint
         uint16_t angleLimit_1 = 0;
         uint16_t angleLimit_2 = 0;
 
-        uint16_t currentAngle = 0;
-
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
         // Limit Switch Handling
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,8 +37,8 @@ class RoveJoint
         void attachLimitSwitches(uint8_t pin1, uint8_t pin2);
         bool isLS1Pressed();
         bool isLS2Pressed();
-        void setAngleLimits(uint16_t angle_1, uint16_t angle_2);
-        bool atSoftLimit(int16_t driveSpeed);
+        void setAngleLimits(float angle_1, float angle_2);
+        bool atSoftLimit(float currentAngle, float goalAngle);
         bool atHardLimit(int16_t driveSpeed);
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,7 +55,6 @@ class RoveJointDifferential : public RoveJoint
 
         #define     rightMotor              motor
         #define     tiltEncoder             encoder
-        #define     currentTiltAngle        currentAngle
         #define     tiltPid                 pid
         #define     limitSwitchLower        limitSwitch_1
         #define     limitSwitchUpper        limitSwitch_2
@@ -70,10 +67,8 @@ class RoveJointDifferential : public RoveJoint
 
         RovePidFloats twistPid;
 
-        uint16_t leftTwistAngleLimit = 0;
-        uint16_t rightTwistAngleLimit = 0;
-
-        uint16_t currentTwistAngle = 0;
+        float leftTwistAngleLimit = 0;
+        float rightTwistAngleLimit = 0;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
         //Limit Switch Handling
@@ -82,15 +77,15 @@ class RoveJointDifferential : public RoveJoint
         //returns whether or not the Limit switch is pressed (if we are moving past that given limit)
         bool isLowerLSPressed();
         bool isUpperLSPressed();
-        void setTiltLimits(uint16_t lowerLimit, uint16_t upperLimit);
-        void setTwistLimits(uint16_t leftLimit, uint16_t rightLimit);
+        void setTiltLimits(float lowerLimit, float upperLimit);
+        void setTwistLimits(float leftLimit, float rightLimit);
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
         //Calculations
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
-        bool atTiltSoftLimit(int16_t driveSpeed);
+        bool atTiltSoftLimit(float currentAngle, float goalAngle);
         bool atTiltHardLimit(int16_t driveSpeed);
-        bool atTwistLimit(int16_t driveSpeed);
+        bool atTwistLimit(float currentAngle, float goalAngle);
         void moveDiffJoint( int16_t tiltSpeed, int16_t twistSpeed);
         void stopDiffJoint( int16_t tiltSpeed, int16_t twistSpeed);
         

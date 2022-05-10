@@ -24,24 +24,24 @@ bool RoveJoint::isLS2Pressed()
 }
 
 //Sets the Soft Angle Limits to prevent the joint from hitting the limit switch.
-void RoveJoint::setAngleLimits( uint16_t angle_1, uint16_t angle_2 )
+void RoveJoint::setAngleLimits( float angle_1, float angle_2 )
 {
     angleLimit_1 = angle_1;
     angleLimit_2 = angle_2;
 }
 
 //Returns whether or not the angle limits were reached
-bool RoveJoint::atSoftLimit( int16_t driveSpeed )
+bool RoveJoint::atSoftLimit( float currentAngle, float goalAngle)
 {
     //if we are trying to move foward, and we are hitting the forward limit switch stop
     //the limit is hit if the switch is no longer being pressed
-    if( driveSpeed > 0 && ( currentAngle <= angleLimit_1 && currentAngle > 180) )
+    if( ( currentAngle >= angleLimit_2 && goalAngle > angleLimit_2 ) )
     {
         return true;
     }
     //if we are trying to move backward, and we are hitting the backward limit switch stop
     //the limit is hit if the switch is no longer being pressed
-    else if( driveSpeed < 0 && ( currentAngle >= angleLimit_2 && currentAngle < 180) )
+    else if( ( currentAngle <= angleLimit_1 && goalAngle < angleLimit_1 ) )
     {
         return true;
     }
@@ -119,13 +119,13 @@ bool RoveJointDifferential::isLowerLSPressed()
 bool RoveJointDifferential::isUpperLSPressed()
 {
     //HIGH or LOW, but we can just map to a boolean
-    return isLS2Pressed();
+    return (digitalRead(limitSwitchUpper));
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //Sets Tilt soft angle limits.
 /////////////////////////////////////////////////////////////////////////////
-void RoveJointDifferential::setTiltLimits(uint16_t lowerLimit, uint16_t upperLimit)
+void RoveJointDifferential::setTiltLimits(float lowerLimit, float upperLimit)
 {
     setAngleLimits(lowerLimit, upperLimit);
 }
@@ -133,7 +133,7 @@ void RoveJointDifferential::setTiltLimits(uint16_t lowerLimit, uint16_t upperLim
 //////////////////////////////////////////////////////////////////////////////
 //Sets Twist soft angle limits.
 /////////////////////////////////////////////////////////////////////////////
-void RoveJointDifferential::setTwistLimits(uint16_t leftLimit, uint16_t rightLimit)
+void RoveJointDifferential::setTwistLimits(float leftLimit, float rightLimit)
 {
     leftTwistAngleLimit = leftLimit;
     rightTwistAngleLimit = rightLimit;
@@ -150,24 +150,24 @@ bool RoveJointDifferential::atTiltHardLimit(int16_t driveSpeed)
 //////////////////////////////////////////////////////////////////////////////
 //Returns whether we are moving past our angle limits
 //////////////////////////////////////////////////////////////////////////////
-bool RoveJointDifferential::atTiltSoftLimit(int16_t driveSpeed)
+bool RoveJointDifferential::atTiltSoftLimit(float currentAngle, float goalAngle)
 {
-    atSoftLimit(driveSpeed);
+    atSoftLimit( currentAngle,  goalAngle);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //Returns whether we are moving past our angle limits
 //////////////////////////////////////////////////////////////////////////////
-bool RoveJointDifferential::atTwistLimit(int16_t driveSpeed)
+bool RoveJointDifferential::atTwistLimit(float currentAngle, float goalAngle)
 {
 
   //if we are driving to the left, and we are past the limits
-  if(driveSpeed < 0 && (currentTwistAngle <= leftTwistAngleLimit && currentTwistAngle > 180000))
+  if( ( currentAngle <= leftTwistAngleLimit && goalAngle > leftTwistAngleLimit ))
   {
     return true;
   }
   //if we are driving to the right, and we are past the limits
-  else if(driveSpeed > 0 && (currentTwistAngle >= rightTwistAngleLimit && currentTwistAngle < 180000))
+  else if( ( currentAngle >= rightTwistAngleLimit && goalAngle < rightTwistAngleLimit ))
   {
     return true;
   }
