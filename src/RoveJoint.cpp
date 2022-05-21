@@ -56,13 +56,13 @@ bool RoveJoint::atHardLimit( int16_t driveSpeed )
 {
     //if we are trying to move foward, and we are hitting the forward limit switch stop
     //the limit is hit if the switch is no longer being pressed
-    if( driveSpeed > 0 && !isLS2Pressed() )
+    if( driveSpeed > 0 && isLS2Pressed() )
     {
         return true;
     }
     //if we are trying to move backward, and we are hitting the backward limit switch stop
     //the limit is hit if the switch is no longer being pressed
-    else if( driveSpeed < 0 && !isLS1Pressed() )
+    else if( driveSpeed < 0 && isLS1Pressed() )
     {
         return true;
     }
