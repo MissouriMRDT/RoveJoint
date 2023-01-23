@@ -1,16 +1,8 @@
-# RoveJoint #
+# RoveJoint
+Embedded software libraries for control of robotic joints. A [RoveJoint](RoveJoint.h) consists of a motor and an encoder, with support for soft/hard limits and closed loop control. A [RoveDifferentialJoint](RoveDifferentialJoint.h) contains the same information, but for two joints connected in a differential pairing (typically used for the Arm's wrist, found [here](https://github.com/MissouriMRDT/ArmBoard_Software)).
 
-Joint class for the Missouri S&T IoT Rover, Networked Tiva C microcontroller boosterpacks based on Energia IDE platform for the University Rover Challenge.
-
-This library has both a Brushed DC Motor implementation and a currently WIP Brushless Motor implementation which utilizies a ODrive interfacing library to send commands to the ODrive brushless motor controller using their ASCII protocol. 
-
-The development of this library is heading towards being able to use these classes interchangeably depending on whether a joint utilizes brushed or brushless motors so that all of the differences are abstracted away from the end user.
-
-<pre>
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Depends on RoveHalTiva, RoveMotor, RoveEncoder please install from:
-// https://github.com/MissouriMRDT/RoveHalTiva 
-// https://github.com/MissouriMRDT/RoveMotor
-// https://github.com/MissouriMRDT/RoveEncoder
-// https://github.com/MissouriMRDT/RovesODrive_Software
-</pre>
+## Dependencies
+ - [RoveMotor](https://github.com/MissouriMRDT/RoveMotor)
+ - [RoveEncoder](https://github.com/MissouriMRDT/RoveEncoder)
+ - [RoveSwitch](https://github.com/MissouriMRDT/RoveSwitch)
+ - [RoveControl](https://github.com/MissouriMRDT/ArmBoard_Software)
