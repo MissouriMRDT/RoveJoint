@@ -24,6 +24,7 @@ private:
     bool m_hasForwardHardLimit = false, m_hasReverseHardLimit = false;
     RoveSwitch* m_forwardHardLimit = nullptr;
     RoveSwitch* m_reverseHardLimit = nullptr;
+    bool m_forwardHardLimitDisabled = false, m_reverseHardLimitDisabled = false;
 
     bool m_hasForwardSoftLimit = false, m_hasReverseSoftLimit = false;
     float m_forwardSoftLimitDegrees, m_reverseSoftLimitDegrees;
@@ -106,6 +107,23 @@ public:
      * @param reverseLimitDegrees Encoder value that is not to be exceeded in the negative direction, in degrees.
      */
     void configSoftLimits(const float& forwardLimitDegrees, const float& reverseLimitDegrees);
+
+
+
+    /**
+     * @brief Enable or disable the forward hard limit.
+     * 
+     * @param disable False to enable, true to disable.
+     */
+    void overrideForwardHardLimit(bool disable);
+
+    /**
+     * @brief Enable or disable the reverse hard limit.
+     * 
+     * @param disable False to enable, true to disable.
+     */
+    void overrideReverseHardLimit(bool disable);
+
 
 
     /**

@@ -29,6 +29,7 @@ private:
     RoveSwitch* m_twistReverseHardLimit = nullptr;
     RoveSwitch* m_tiltForwardHardLimit = nullptr;
     RoveSwitch* m_tiltReverseHardLimit = nullptr;
+    bool m_twistForwardHardLimitDisabled = false, m_twistReverseHardLimitDisabled = false, m_tiltForwardHardLimitDisabled = false, m_tiltReverseHardLimitDisabled = false;
 
     bool m_hasTwistForwardSoftLimit = false, m_hasTwistReverseSoftLimit = false, m_hasTiltForwardSoftLimit = false, m_hasTiltReverseSoftLimit = false;
     float m_twistForwardSoftLimitDegrees, m_twistReverseSoftLimitDegrees, m_tiltForwardSoftLimitDegrees, m_tiltReverseSoftLimitDegrees;
@@ -191,6 +192,36 @@ public:
      * @param reverseLimitDegrees Encoder value that is not to be exceeded in the negative tilt direction, in degrees.
      */
     void configTiltSoftLimits(const float& forwardLimitDegrees, const float& reverseLimitDegrees);
+
+
+    /**
+     * @brief Enable or disable the twist forward hard limit.
+     * 
+     * @param disable False to enable, true to disable.
+     */
+    void overrideTwistForwardHardLimit(bool disable);
+
+    /**
+     * @brief Enable or disable the twist reverse hard limit.
+     * 
+     * @param disable False to enable, true to disable.
+     */
+    void overrideTwistReverseHardLimit(bool disable);
+
+
+    /**
+     * @brief Enable or disable the tilt forward hard limit.
+     * 
+     * @param disable False to enable, true to disable.
+     */
+    void overrideTiltForwardHardLimit(bool disable);
+
+    /**
+     * @brief Enable or disable the tilt reverse hard limit.
+     * 
+     * @param disable False to enable, true to disable.
+     */
+    void overrideTiltReverseHardLimit(bool disable);
 
 
     /**

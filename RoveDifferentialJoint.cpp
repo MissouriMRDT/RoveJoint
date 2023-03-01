@@ -121,6 +121,24 @@ void RoveDifferentialJoint::configTiltSoftLimits(const float& forwardLimitDegree
 
 
 
+void RoveDifferentialJoint::overrideTwistForwardHardLimit(bool disable) {
+    m_twistForwardHardLimitDisabled = disable;
+}
+
+void RoveDifferentialJoint::overrideTwistReverseHardLimit(bool disable) {
+    m_twistReverseHardLimitDisabled = disable;
+}
+
+void RoveDifferentialJoint::overrideTiltForwardHardLimit(bool disable) {
+    m_tiltForwardHardLimitDisabled = disable;
+}
+
+void RoveDifferentialJoint::overrideTiltReverseHardLimit(bool disable) {
+    m_tiltReverseHardLimitDisabled = disable;
+}
+
+
+
 bool RoveDifferentialJoint::atTwistForwardSoftLimit() {
     if (m_hasTwistEncoder && m_hasTwistForwardSoftLimit) {
         return m_twistEncoder->readDegrees() >= m_twistForwardSoftLimitDegrees;
@@ -182,11 +200,11 @@ bool RoveDifferentialJoint::atTiltReverseHardLimit() {
 
 
 void RoveDifferentialJoint::drive(int16_t twistDecipercent, int16_t tiltDecipercent) {
-    if (twistDecipercent > 0 && (atTwistForwardHardLimit() || atTwistForwardSoftLimit())) twistDecipercent = 0;
-    else if (twistDecipercent < 0 && (atTwistReverseHardLimit() || atTwistReverseSoftLimit())) twistDecipercent = 0;
+    if (twistDecipercent > 0 && (atTwistForwardSoftLimit() || (atTwistForwardHardLimit() && !m_twistForwardHardLimitDisabled))) twistDecipercent = 0;
+    else if (twistDecipercent < 0 && (atTwistReverseSoftLimit() || (atTwistReverseHardLimit() && !m_twistReverseHardLimitDisabled))) twistDecipercent = 0;
     
-    if (tiltDecipercent > 0 && (atTiltForwardHardLimit() || atTiltForwardSoftLimit())) tiltDecipercent = 0;
-    else if (tiltDecipercent < 0 && (atTiltReverseHardLimit() || atTiltReverseSoftLimit())) tiltDecipercent = 0;
+    if (tiltDecipercent > 0 && (atTiltForwardSoftLimit() || (atTiltForwardHardLimit() && !m_tiltForwardHardLimitDisabled))) tiltDecipercent = 0;
+    else if (tiltDecipercent < 0 && (atTiltReverseSoftLimit() || (atTiltReverseHardLimit() && !m_tiltReverseHardLimitDisabled))) tiltDecipercent = 0;
 
     int16_t leftDecipercent, rightDecipercent;
     twistAndTiltDecipercent_to_leftAndRightDecipercent(twistDecipercent, tiltDecipercent, leftDecipercent, rightDecipercent);
