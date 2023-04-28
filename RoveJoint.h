@@ -13,30 +13,38 @@ class RoveJoint {
 
 private:
     
-    RoveMotor* m_motor;
+    const RoveMotor* m_motor;
 
     bool m_hasEncoder = false;
-    RoveEncoder* m_encoder = nullptr;
+    const RoveEncoder* m_encoder = nullptr;
 
     bool m_hasClosedLoop = false;
-    RovePIDController* m_pidController = nullptr;
+    const RovePIDController* m_pidController = nullptr;
 
     bool m_hasForwardHardLimit = false, m_hasReverseHardLimit = false;
-    RoveSwitch* m_forwardHardLimit = nullptr;
-    RoveSwitch* m_reverseHardLimit = nullptr;
+    const RoveSwitch* m_forwardHardLimit = nullptr;
+    const RoveSwitch* m_reverseHardLimit = nullptr;
     bool m_forwardHardLimitDisabled = false, m_reverseHardLimitDisabled = false;
 
     bool m_hasForwardSoftLimit = false, m_hasReverseSoftLimit = false;
     float m_forwardSoftLimitDegrees, m_reverseSoftLimitDegrees;
 
+
     /**
-     * @brief Check if the closed loop target is within the range of the configured soft limits.
+     * @brief Check if the given degree value trips the forward soft limit.
      * 
-     * @param targetDegrees Closed loop target, in degrees.
-     * @return False if targetDegrees is greater than the configured forward soft limit or less than the configured reverse soft limit.
-     * @return True if no soft limits have been configured. 
+     * @return True if soft limit triggered.
+     * @return False otherwise.
      */
-    bool closedLoopTargetValid(const float& targetDegrees);
+    bool atForwardSoftLimit(const float& degrees) const;
+    
+    /**
+     * @brief Check if the given degree value trips the reverse soft limit.
+     * 
+     * @return True if soft limit triggered.
+     * @return False otherwise.
+     */
+    bool atReverseSoftLimit(const float& degrees) const;
 
 public:
 
@@ -45,7 +53,7 @@ public:
      * 
      * @param motor Pointer to an already configured RoveMotor.
      */
-    RoveJoint(RoveMotor* motor) : m_motor(motor) {}
+    RoveJoint(const RoveMotor* motor) : m_motor(motor) {}
 
 
     /**
@@ -53,14 +61,14 @@ public:
      * 
      * @param encoder Pointer to an already configured RoveEncoder.
      */
-    void attachEncoder(RoveEncoder* encoder);
+    void attachEncoder(const RoveEncoder* encoder);
 
     /**
      * @brief Attach a PID controller to the joint.
      * 
      * @param pidController Pointer to an already configured RovePIDController.
      */
-    void attachPID(RovePIDController* pidController);
+    void attachPID(const RovePIDController* pidController);
 
 
     /**
@@ -68,22 +76,22 @@ public:
      * 
      * @param hardLimit Pointer to an already configured RoveSwitch.
      */
-    void attachForwardHardLimit(RoveSwitch* hardLimit);
+    void attachForwardHardLimit(const RoveSwitch* hardLimit);
 
     /**
      * @brief Attach a reverse hard limit to the joint.
      * 
      * @param hardLimit Pointer to an already configured RoveSwitch.
      */
-    void attachReverseHardLimit(RoveSwitch* hardLimit);
+    void attachReverseHardLimit(const RoveSwitch* hardLimit);
 
     /**
      * @brief Attach both forward and reverse hard limits to the joint.
      * 
-     * @param forwardHardLimit Pointer to an already configured RoveSwitch.
      * @param reverseHardLimit Pointer to an already configured RoveSwitch.
+     * @param forwardHardLimit Pointer to an already configured RoveSwitch.
      */
-    void attachHardLimits(RoveSwitch* forwardHardLimit, RoveSwitch* reverseHardLimit);
+    void attachHardLimits(const RoveSwitch* reverseHardLimit, const RoveSwitch* forwardHardLimit);
 
 
     /**
@@ -103,10 +111,10 @@ public:
     /**
      * @brief Configure both the forward and reverse soft limits.
      * 
-     * @param forwardLimitDegrees Encoder value that is not to be exceeded in the positive direction, in degrees.
      * @param reverseLimitDegrees Encoder value that is not to be exceeded in the negative direction, in degrees.
+     * @param forwardLimitDegrees Encoder value that is not to be exceeded in the positive direction, in degrees.
      */
-    void configSoftLimits(const float& forwardLimitDegrees, const float& reverseLimitDegrees);
+    void configSoftLimits(const float& reverseLimitDegrees, const float& forwardLimitDegrees);
 
 
 
@@ -132,7 +140,7 @@ public:
      * @return True if the encoder value is greater than the configured forward soft limit.
      * @return False if an encoder has not been attached or a forward soft limit has not been configured.
      */
-    bool atForwardSoftLimit();
+    bool atForwardSoftLimit() const;
 
     /**
      * @brief Check if the joint is at its reverse soft limit.
@@ -140,7 +148,7 @@ public:
      * @return True if the encoder value is less than the configured reverse soft limit.
      * @return False if an encoder has not been attached or a reverse soft limit has not been configured.
      */
-    bool atReverseSoftLimit();
+    bool atReverseSoftLimit() const;
 
 
 
@@ -150,7 +158,7 @@ public:
      * @return True if the forward hard limit is tripped.
      * @return False if a forward hard limit has not been attached. 
      */
-    bool atForwardHardLimit();
+    bool atForwardHardLimit() const;
 
     /**
      * @brief Check if the joint is at its reverse hard limit.
@@ -158,23 +166,24 @@ public:
      * @return True if the reverse hard limit is tripped.
      * @return False if a reverse hard limit has not been attached. 
      */
-    bool atReverseHardLimit();
+    bool atReverseHardLimit() const;
 
 
     /**
      * @brief Write the provided drive signal to the joint.
      * 
      * @param decipercent Motor output [-1000, 1000].
+     * @param timestamp Current timestamp in seconds.
      */
-    void drive(int16_t decipercent);
+    void drive(int16_t decipercent, const float& timestamp) const;
 
     /**
      * @brief Set the joint in closed loop control towards the target angle.
      * 
      * @param targetDegrees Closed loop target, in degrees.
-     * @param timestamp Current timestamp.
+     * @param timestamp Current timestamp in seconds.
      */
-    void setAngle(const float& targetDegrees, const float& timestamp);
+    void setAngle(const float& targetDegrees, const float& timestamp) const;
 
 };
 
