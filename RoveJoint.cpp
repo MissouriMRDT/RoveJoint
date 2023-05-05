@@ -106,16 +106,11 @@ void RoveJoint::drive(int16_t decipercent, const float& timestamp) const {
     m_motor->drive(decipercent, timestamp);
 }
 
-
-#include <iostream>
-using namespace std;
 void RoveJoint::setAngle(const float& targetDegrees, const float& timestamp) const {
     int16_t decipercent = 0;
     if (m_hasEncoder && m_hasClosedLoop && !atForwardSoftLimit(targetDegrees) && !atReverseSoftLimit(targetDegrees)) {
         decipercent = (int16_t) m_pidController->calculate(targetDegrees, m_encoder->readDegrees(), timestamp);
-        cout << "Valid" << endl;
     }
-    else cout << "Invalid" << endl;
     
     drive(decipercent, timestamp);
 }
