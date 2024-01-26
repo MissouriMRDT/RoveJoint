@@ -173,17 +173,15 @@ public:
      * @brief Write the provided drive signal to the joint.
      * 
      * @param decipercent Motor output [-1000, 1000].
-     * @param timestamp Current timestamp in seconds.
      */
-    void drive(int16_t decipercent, const float& timestamp) const;
+    void drive(int16_t decipercent) const;
 
     /**
      * @brief Set the joint in closed loop control towards the target angle.
      * 
      * @param targetDegrees Closed loop target, in degrees.
-     * @param timestamp Current timestamp in seconds.
      */
-    void setAngle(const float& targetDegrees, const float& timestamp) const;
+    void setAngle(const float& targetDegrees) const;
 
 };
 

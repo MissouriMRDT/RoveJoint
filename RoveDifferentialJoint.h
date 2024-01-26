@@ -310,18 +310,16 @@ public:
      * 
      * @param twistDecipercent Twist output [-1000, 1000].
      * @param tiltDecipercent Tilt output [-1000, 1000].
-     * @param timestamp Current timestamp in seconds.
      */
-    void drive(int16_t twistDecipercent, int16_t tiltDecipercent, const float& timestamp) const;
+    void drive(int16_t twistDecipercent, int16_t tiltDecipercent) const;
 
     /**
      * @brief Set the differential joint in closed loop control towards the target angles.
      * 
      * @param twistTargetDegrees Twist closed loop target, in degrees.
      * @param tiltTargetDegrees Tilt closed loop target, in degrees.
-     * @param timestamp Current timestamp in seconds.
      */
-    void setAngles(const float& twistTargetDegrees, const float& tiltTargetDegrees, const float& timestamp) const;
+    void setAngles(const float& twistTargetDegrees, const float& tiltTargetDegrees) const;
     
 };
 

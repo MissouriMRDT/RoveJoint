@@ -201,7 +201,7 @@ bool RoveDifferentialJoint::atTiltReverseHardLimit() const {
 
 
 
-void RoveDifferentialJoint::drive(int16_t twistDecipercent, int16_t tiltDecipercent, const float& timestamp) const {
+void RoveDifferentialJoint::drive(int16_t twistDecipercent, int16_t tiltDecipercent) const {
     if (twistDecipercent > 0 && (atTwistForwardSoftLimit() || (!m_twistForwardHardLimitDisabled && atTwistForwardHardLimit()))) twistDecipercent = 0;
     else if (twistDecipercent < 0 && (atTwistReverseSoftLimit() || (!m_twistReverseHardLimitDisabled && atTwistReverseHardLimit()))) twistDecipercent = 0;
     
@@ -211,20 +211,20 @@ void RoveDifferentialJoint::drive(int16_t twistDecipercent, int16_t tiltDeciperc
     int16_t leftDecipercent, rightDecipercent;
     twistAndTiltDecipercent_to_leftAndRightDecipercent(twistDecipercent, tiltDecipercent, leftDecipercent, rightDecipercent);
     
-    m_leftMotor->drive(leftDecipercent, timestamp);
-    m_rightMotor->drive(rightDecipercent, timestamp);
+    m_leftMotor->drive(leftDecipercent);
+    m_rightMotor->drive(rightDecipercent);
 }
 
-void RoveDifferentialJoint::setAngles(const float& twistTargetDegrees, const float& tiltTargetDegrees, const float& timestamp) const {
+void RoveDifferentialJoint::setAngles(const float& twistTargetDegrees, const float& tiltTargetDegrees) const {
     int16_t twistDecipercent = 0;
     if (m_hasTwistEncoder && m_hasTwistClosedLoop && !atTwistForwardSoftLimit(twistTargetDegrees) && !atTwistReverseSoftLimit(twistTargetDegrees)) {
-        twistDecipercent = (int16_t) m_twistPIDController->calculate(twistTargetDegrees, m_twistEncoder->readDegrees(), timestamp);
+        twistDecipercent = (int16_t) m_twistPIDController->calculate(twistTargetDegrees, m_twistEncoder->readDegrees());
     }
 
     int16_t tiltDecipercent = 0;
     if (m_hasTiltEncoder && m_hasTiltClosedLoop && !atTiltForwardSoftLimit(tiltTargetDegrees) && !atTiltReverseSoftLimit(tiltTargetDegrees)) {
-        tiltDecipercent = (int16_t) m_tiltPIDController->calculate(tiltTargetDegrees, m_tiltEncoder->readDegrees(), timestamp);
+        tiltDecipercent = (int16_t) m_tiltPIDController->calculate(tiltTargetDegrees, m_tiltEncoder->readDegrees());
     }
 
-    drive(twistDecipercent, tiltDecipercent, timestamp);
+    drive(twistDecipercent, tiltDecipercent);
 }

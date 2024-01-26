@@ -99,18 +99,18 @@ bool RoveJoint::atReverseHardLimit() const {
 
 
 
-void RoveJoint::drive(int16_t decipercent, const float& timestamp) const {
+void RoveJoint::drive(int16_t decipercent) const {
     if (decipercent > 0 && (atForwardSoftLimit() || (!m_forwardHardLimitDisabled && atForwardHardLimit()))) decipercent = 0;
     else if (decipercent < 0 && (atReverseSoftLimit() || (!m_reverseHardLimitDisabled && atReverseHardLimit()))) decipercent = 0;
     
-    m_motor->drive(decipercent, timestamp);
+    m_motor->drive(decipercent);
 }
 
-void RoveJoint::setAngle(const float& targetDegrees, const float& timestamp) const {
+void RoveJoint::setAngle(const float& targetDegrees) const {
     int16_t decipercent = 0;
     if (m_hasEncoder && m_hasClosedLoop && !atForwardSoftLimit(targetDegrees) && !atReverseSoftLimit(targetDegrees)) {
-        decipercent = (int16_t) m_pidController->calculate(targetDegrees, m_encoder->readDegrees(), timestamp);
+        decipercent = (int16_t) m_pidController->calculate(targetDegrees, m_encoder->readDegrees());
     }
     
-    drive(decipercent, timestamp);
+    drive(decipercent);
 }
