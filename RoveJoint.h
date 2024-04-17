@@ -13,17 +13,17 @@ class RoveJoint {
 
 private:
     
-    const RoveMotor* m_motor;
+    RoveMotor* m_motor;
 
     bool m_hasEncoder = false;
-    const RoveEncoder* m_encoder = nullptr;
+    RoveEncoder* m_encoder = nullptr;
 
     bool m_hasClosedLoop = false;
-    const RovePIDController* m_pidController = nullptr;
+    RovePIDController* m_pidController = nullptr;
 
     bool m_hasForwardHardLimit = false, m_hasReverseHardLimit = false;
-    const RoveSwitch* m_forwardHardLimit = nullptr;
-    const RoveSwitch* m_reverseHardLimit = nullptr;
+    RoveSwitch* m_forwardHardLimit = nullptr;
+    RoveSwitch* m_reverseHardLimit = nullptr;
     bool m_forwardHardLimitDisabled = false, m_reverseHardLimitDisabled = false;
 
     bool m_hasForwardSoftLimit = false, m_hasReverseSoftLimit = false;
@@ -53,7 +53,7 @@ public:
      * 
      * @param motor Pointer to an already configured RoveMotor.
      */
-    RoveJoint(const RoveMotor* motor) : m_motor(motor) {}
+    RoveJoint(RoveMotor* motor) : m_motor(motor) {}
 
 
     /**
@@ -61,14 +61,14 @@ public:
      * 
      * @param encoder Pointer to an already configured RoveEncoder.
      */
-    void attachEncoder(const RoveEncoder* encoder);
+    void attachEncoder(RoveEncoder* encoder);
 
     /**
      * @brief Attach a PID controller to the joint.
      * 
      * @param pidController Pointer to an already configured RovePIDController.
      */
-    void attachPID(const RovePIDController* pidController);
+    void attachPID(RovePIDController* pidController);
 
 
     /**
@@ -76,14 +76,14 @@ public:
      * 
      * @param hardLimit Pointer to an already configured RoveSwitch.
      */
-    void attachForwardHardLimit(const RoveSwitch* hardLimit);
+    void attachForwardHardLimit(RoveSwitch* hardLimit);
 
     /**
      * @brief Attach a reverse hard limit to the joint.
      * 
      * @param hardLimit Pointer to an already configured RoveSwitch.
      */
-    void attachReverseHardLimit(const RoveSwitch* hardLimit);
+    void attachReverseHardLimit(RoveSwitch* hardLimit);
 
     /**
      * @brief Attach both forward and reverse hard limits to the joint.
@@ -91,7 +91,28 @@ public:
      * @param reverseHardLimit Pointer to an already configured RoveSwitch.
      * @param forwardHardLimit Pointer to an already configured RoveSwitch.
      */
-    void attachHardLimits(const RoveSwitch* reverseHardLimit, const RoveSwitch* forwardHardLimit);
+    void attachHardLimits(RoveSwitch* reverseHardLimit, RoveSwitch* forwardHardLimit);
+
+
+    RoveMotor* Motor() {
+        return m_motor;
+    }
+
+    RoveEncoder* Encoder() {
+        return m_encoder;
+    }
+
+    RovePIDController* PID() {
+        return m_pidController;
+    }
+
+    RoveSwitch* ForwardHardLimit() {
+        return m_forwardHardLimit;
+    }
+
+    RoveSwitch* ReverseHardLimit() {
+        return m_reverseHardLimit;
+    }
 
 
     /**

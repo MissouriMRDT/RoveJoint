@@ -23,29 +23,29 @@ bool RoveJoint::atReverseSoftLimit(const float& degrees) const {
 
 
 
-void RoveJoint::attachEncoder(const RoveEncoder* encoder) {
+void RoveJoint::attachEncoder(RoveEncoder* encoder) {
     m_encoder = encoder;
     m_hasEncoder = true;
 }
 
-void RoveJoint::attachPID(const RovePIDController* pidController) {
+void RoveJoint::attachPID(RovePIDController* pidController) {
     m_pidController = pidController;
     m_hasClosedLoop = true;
 }
 
 
 
-void RoveJoint::attachForwardHardLimit(const RoveSwitch* hardLimit) {
+void RoveJoint::attachForwardHardLimit(RoveSwitch* hardLimit) {
     m_forwardHardLimit = hardLimit;
     m_hasForwardHardLimit = true;
 }
 
-void RoveJoint::attachReverseHardLimit(const RoveSwitch* hardLimit) {
+void RoveJoint::attachReverseHardLimit(RoveSwitch* hardLimit) {
     m_reverseHardLimit = hardLimit;
     m_hasReverseHardLimit = true;
 }
 
-void RoveJoint::attachHardLimits(const RoveSwitch* reverseHardLimit, const RoveSwitch* forwardHardLimit) {
+void RoveJoint::attachHardLimits(RoveSwitch* reverseHardLimit, RoveSwitch* forwardHardLimit) {
     attachReverseHardLimit(reverseHardLimit);
     attachForwardHardLimit(forwardHardLimit);
 }
