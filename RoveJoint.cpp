@@ -77,6 +77,14 @@ void RoveJoint::overrideReverseHardLimit(bool disable) {
     m_reverseHardLimitDisabled = disable;
 }
 
+void RoveJoint::overrideForwardSoftLimit(bool disable) {
+    m_forwardSoftLimitDisabled = disable;
+}
+
+void RoveJoint::overrideReverseSoftLimit(bool disable) {
+    m_reverseSoftLimitDisabled = disable;
+}
+
 
 
 bool RoveJoint::atForwardSoftLimit() const {
@@ -100,8 +108,8 @@ bool RoveJoint::atReverseHardLimit() const {
 
 
 void RoveJoint::drive(int16_t decipercent) const {
-    if (decipercent > 0 && (atForwardSoftLimit() || (!m_forwardHardLimitDisabled && atForwardHardLimit()))) decipercent = 0;
-    else if (decipercent < 0 && (atReverseSoftLimit() || (!m_reverseHardLimitDisabled && atReverseHardLimit()))) decipercent = 0;
+    if (decipercent > 0 && ((!m_forwardSoftLimitDisabled && atForwardSoftLimit()) || (!m_forwardHardLimitDisabled && atForwardHardLimit()))) decipercent = 0;
+    else if (decipercent < 0 && ((!m_reverseSoftLimitDisabled && atReverseSoftLimit()) || (!m_reverseHardLimitDisabled && atReverseHardLimit()))) decipercent = 0;
     
     m_motor->drive(decipercent);
 }

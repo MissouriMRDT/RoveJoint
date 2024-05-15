@@ -28,6 +28,7 @@ private:
 
     bool m_hasForwardSoftLimit = false, m_hasReverseSoftLimit = false;
     float m_forwardSoftLimitDegrees, m_reverseSoftLimitDegrees;
+    bool m_forwardSoftLimitDisabled = false, m_reverseSoftLimitDisabled = false;
 
 
     /**
@@ -152,6 +153,20 @@ public:
      * @param disable False to enable, true to disable.
      */
     void overrideReverseHardLimit(bool disable);
+
+    /**
+     * @brief Enable or disable the forward soft limit.
+     * 
+     * @param disable False to enable, true to disable.
+     */
+    void overrideForwardSoftLimit(bool disable);
+
+    /**
+     * @brief Enable or disable the reverse soft limit.
+     * 
+     * @param disable False to enable, true to disable.
+     */
+    void overrideReverseSoftLimit(bool disable);
 
 
 
