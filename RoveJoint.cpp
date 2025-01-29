@@ -108,17 +108,35 @@ bool RoveJoint::atReverseHardLimit() const {
 
 
 void RoveJoint::drive(int16_t decipercent) const {
-    if (decipercent > 0 && ((!m_forwardSoftLimitDisabled && atForwardSoftLimit()) || (!m_forwardHardLimitDisabled && atForwardHardLimit()))) decipercent = 0;
-    else if (decipercent < 0 && ((!m_reverseSoftLimitDisabled && atReverseSoftLimit()) || (!m_reverseHardLimitDisabled && atReverseHardLimit()))) decipercent = 0;
+    if (decipercent > 0
+        && ((!m_forwardSoftLimitDisabled && atForwardSoftLimit()) 
+            || (!m_forwardHardLimitDisabled && atForwardHardLimit()))) {
+        decipercent = 0;
+    }
+    else if (decipercent < 0 
+            && ((!m_reverseSoftLimitDisabled && atReverseSoftLimit()) 
+                || (!m_reverseHardLimitDisabled && atReverseHardLimit()))) {
+        decipercent = 0;
+    }
     
     m_motor->drive(decipercent);
 }
 
-void RoveJoint::setAngle(const float& targetDegrees) const {
+void RoveJoint::setAngle(float targetDegrees) const {
+    
+    if ((!m_forwardSoftLimitDisabled && atForwardSoftLimit()) 
+        || (!m_forwardHardLimitDisabled && atForwardHardLimit())) {
+            targetDegrees = m_forwardSoftLimitDegrees;
+    }
+    else if ((!m_reverseSoftLimitDisabled && atReverseSoftLimit()) 
+        || (!m_reverseHardLimitDisabled && atReverseHardLimit())) {
+            targetDegrees = m_reverseSoftLimitDegrees;
+    }
+
     int16_t decipercent = 0;
-    if (m_hasEncoder && m_hasClosedLoop && !atForwardSoftLimit(targetDegrees) && !atReverseSoftLimit(targetDegrees)) {
+    if (m_hasEncoder && m_hasClosedLoop) {
         decipercent = (int16_t) m_pidController->calculate(targetDegrees, m_encoder->readDegrees());
     }
     
-    drive(decipercent);
+    m_motor->drive(decipercent);
 }

@@ -217,7 +217,7 @@ public:
      * 
      * @param targetDegrees Closed loop target, in degrees.
      */
-    void setAngle(const float& targetDegrees) const;
+    void setAngle(float targetDegrees) const;
 
 };
 
