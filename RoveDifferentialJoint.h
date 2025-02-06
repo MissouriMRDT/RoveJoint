@@ -42,7 +42,7 @@ private:
      * @param leftDecipercent Output left decipercent.
      * @param rightDecipercent Output right decipercent.
      */
-    void twistAndTiltDecipercent_to_leftAndRightDecipercent(const int16_t& twistDecipercent, const int16_t& tiltDecipercent, int16_t& leftDecipercent, int16_t& rightDecipercent) const;
+    void twistAndTiltDecipercent_to_leftAndRightDecipercent(int16_t twistDecipercent, int16_t tiltDecipercent, int16_t leftDecipercent, int16_t rightDecipercent) const;
 
     /**
      * @brief Check if the given degree value trips the twist forward soft limit.
@@ -50,7 +50,7 @@ private:
      * @return True if soft limit triggered.
      * @return False otherwise.
      */
-    bool atTwistForwardSoftLimit(const float& degrees) const;
+    bool atTwistForwardSoftLimit(float degrees) const;
     
     /**
      * @brief Check if the given degree value trips the twist reverse soft limit.
@@ -58,7 +58,7 @@ private:
      * @return True if soft limit triggered.
      * @return False otherwise.
      */
-    bool atTwistReverseSoftLimit(const float& degrees) const;
+    bool atTwistReverseSoftLimit(float degrees) const;
 
     /**
      * @brief Check if the given degree value trips the tilt forward soft limit.
@@ -66,7 +66,7 @@ private:
      * @return True if soft limit triggered.
      * @return False otherwise.
      */
-    bool atTiltForwardSoftLimit(const float& degrees) const;
+    bool atTiltForwardSoftLimit(float degrees) const;
     
     /**
      * @brief Check if the given degree value trips the tilt reverse soft limit.
@@ -74,7 +74,7 @@ private:
      * @return True if soft limit triggered.
      * @return False otherwise.
      */
-    bool atTiltReverseSoftLimit(const float& degrees) const;
+    bool atTiltReverseSoftLimit(float degrees) const;
 
 public:
 
@@ -167,14 +167,14 @@ public:
      * 
      * @param limitDegrees Encoder value that is not to be exceeded in the positive twist direction, in degrees.
      */
-    void configTwistForwardSoftLimit(const float& limitDegrees);
+    void configTwistForwardSoftLimit(float limitDegrees);
 
     /**
      * @brief Configure the reverse soft limit of the twist axis.
      * 
      * @param limitDegrees Encoder value that is not to be exceeded in the negative twist direction, in degrees.
      */
-    void configTwistReverseSoftLimit(const float& limitDegrees);
+    void configTwistReverseSoftLimit(float limitDegrees);
 
     /**
      * @brief Configure both the forward and reverse soft limits of the twist axis.
@@ -182,7 +182,7 @@ public:
      * @param reverseLimitDegrees Encoder value that is not to be exceeded in the negative twist direction, in degrees.
      * @param forwardLimitDegrees Encoder value that is not to be exceeded in the positive twist direction, in degrees.
      */
-    void configTwistSoftLimits(const float& reverseLimitDegrees, const float& forwardLimitDegrees);
+    void configTwistSoftLimits(float reverseLimitDegrees, float forwardLimitDegrees);
 
 
     /**
@@ -190,14 +190,14 @@ public:
      * 
      * @param limitDegrees Encoder value that is not to be exceeded in the positive tilt direction, in degrees.
      */
-    void configTiltForwardSoftLimit(const float& limitDegrees);
+    void configTiltForwardSoftLimit(float limitDegrees);
 
     /**
      * @brief Configure the reverse soft limit of the tilt axis.
      * 
      * @param limitDegrees Encoder value that is not to be exceeded in the negative tilt direction, in degrees.
      */
-    void configTiltReverseSoftLimit(const float& limitDegrees);
+    void configTiltReverseSoftLimit(float limitDegrees);
 
     /**
      * @brief Configure both the forward and reverse soft limits of the tilt axis.
@@ -205,7 +205,7 @@ public:
      * @param reverseLimitDegrees Encoder value that is not to be exceeded in the negative tilt direction, in degrees.
      * @param forwardLimitDegrees Encoder value that is not to be exceeded in the positive tilt direction, in degrees.
      */
-    void configTiltSoftLimits(const float& reverseLimitDegrees, const float& forwardLimitDegrees);
+    void configTiltSoftLimits(float reverseLimitDegrees, float forwardLimitDegrees);
 
 
     /**
@@ -319,7 +319,7 @@ public:
      * @param twistTargetDegrees Twist closed loop target, in degrees.
      * @param tiltTargetDegrees Tilt closed loop target, in degrees.
      */
-    void setAngles(const float& twistTargetDegrees, const float& tiltTargetDegrees) const;
+    void setAngles(float twistTargetDegrees, float tiltTargetDegrees) const;
     
 };
 

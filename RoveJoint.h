@@ -37,7 +37,7 @@ private:
      * @return True if soft limit triggered.
      * @return False otherwise.
      */
-    bool atForwardSoftLimit(const float& degrees) const;
+    bool atForwardSoftLimit(float degrees) const;
     
     /**
      * @brief Check if the given degree value trips the reverse soft limit.
@@ -45,7 +45,7 @@ private:
      * @return True if soft limit triggered.
      * @return False otherwise.
      */
-    bool atReverseSoftLimit(const float& degrees) const;
+    bool atReverseSoftLimit(float degrees) const;
 
 public:
 
@@ -121,14 +121,14 @@ public:
      * 
      * @param limitDegrees Encoder value that is not to be exceeded in the positive direction, in degrees.
      */
-    void configForwardSoftLimit(const float& limitDegrees);
+    void configForwardSoftLimit(float limitDegrees);
 
     /**
      * @brief Configure the reverse soft limit.
      * 
      * @param limitDegrees Encoder value that is not to be exceeded in the negative direction, in degrees.
      */
-    void configReverseSoftLimit(const float& limitDegrees);
+    void configReverseSoftLimit(float limitDegrees);
 
     /**
      * @brief Configure both the forward and reverse soft limits.
@@ -136,7 +136,7 @@ public:
      * @param reverseLimitDegrees Encoder value that is not to be exceeded in the negative direction, in degrees.
      * @param forwardLimitDegrees Encoder value that is not to be exceeded in the positive direction, in degrees.
      */
-    void configSoftLimits(const float& reverseLimitDegrees, const float& forwardLimitDegrees);
+    void configSoftLimits(float reverseLimitDegrees, float forwardLimitDegrees);
 
 
 

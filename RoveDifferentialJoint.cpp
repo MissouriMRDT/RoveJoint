@@ -3,7 +3,7 @@
 #include <cmath>
 
 
-void RoveDifferentialJoint::twistAndTiltDecipercent_to_leftAndRightDecipercent(const int16_t& twistDecipercent, const int16_t& tiltDecipercent, int16_t& leftDecipercent, int16_t& rightDecipercent) const {
+void RoveDifferentialJoint::twistAndTiltDecipercent_to_leftAndRightDecipercent(int16_t twistDecipercent, int16_t tiltDecipercent, int16_t leftDecipercent, int16_t rightDecipercent) const {
     leftDecipercent = twistDecipercent + tiltDecipercent;
     rightDecipercent = twistDecipercent - tiltDecipercent;
 
@@ -15,7 +15,7 @@ void RoveDifferentialJoint::twistAndTiltDecipercent_to_leftAndRightDecipercent(c
     rightDecipercent *= scale;
 }
 
-bool RoveDifferentialJoint::atTwistForwardSoftLimit(const float& degrees) const {
+bool RoveDifferentialJoint::atTwistForwardSoftLimit(float degrees) const {
     if (m_hasTwistForwardSoftLimit) {
         if (m_hasTwistReverseSoftLimit && (m_twistReverseSoftLimitDegrees > m_twistForwardSoftLimitDegrees)) {
             return (degrees >= m_twistForwardSoftLimitDegrees) && (degrees <= (m_twistReverseSoftLimitDegrees + m_twistForwardSoftLimitDegrees)/2);
@@ -25,7 +25,7 @@ bool RoveDifferentialJoint::atTwistForwardSoftLimit(const float& degrees) const 
     return false;
 }
 
-bool RoveDifferentialJoint::atTwistReverseSoftLimit(const float& degrees) const {
+bool RoveDifferentialJoint::atTwistReverseSoftLimit(float degrees) const {
     if (m_hasTwistReverseSoftLimit) {
         if (m_hasTwistForwardSoftLimit && (m_twistReverseSoftLimitDegrees > m_twistForwardSoftLimitDegrees)) {
             return (degrees <= m_twistReverseSoftLimitDegrees) && (degrees >= (m_twistReverseSoftLimitDegrees + m_twistForwardSoftLimitDegrees)/2);
@@ -35,7 +35,7 @@ bool RoveDifferentialJoint::atTwistReverseSoftLimit(const float& degrees) const 
     return false;
 }
 
-bool RoveDifferentialJoint::atTiltForwardSoftLimit(const float& degrees) const {
+bool RoveDifferentialJoint::atTiltForwardSoftLimit(float degrees) const {
     if (m_hasTiltForwardSoftLimit) {
         if (m_hasTiltReverseSoftLimit && (m_tiltReverseSoftLimitDegrees > m_tiltForwardSoftLimitDegrees)) {
             return (degrees >= m_tiltForwardSoftLimitDegrees) && (degrees <= (m_tiltReverseSoftLimitDegrees + m_tiltForwardSoftLimitDegrees)/2);
@@ -45,7 +45,7 @@ bool RoveDifferentialJoint::atTiltForwardSoftLimit(const float& degrees) const {
     return false;
 }
 
-bool RoveDifferentialJoint::atTiltReverseSoftLimit(const float& degrees) const {
+bool RoveDifferentialJoint::atTiltReverseSoftLimit(float degrees) const {
     if (m_hasTiltReverseSoftLimit) {
         if (m_hasTiltForwardSoftLimit && (m_tiltReverseSoftLimitDegrees > m_tiltForwardSoftLimitDegrees)) {
             return (degrees <= m_tiltReverseSoftLimitDegrees) && (degrees >= (m_tiltReverseSoftLimitDegrees + m_tiltForwardSoftLimitDegrees)/2);
@@ -113,34 +113,34 @@ void RoveDifferentialJoint::attachTiltHardLimits(const RoveSwitch* reverseHardLi
 
 
 
-void RoveDifferentialJoint::configTwistForwardSoftLimit(const float& limitDegrees) {
+void RoveDifferentialJoint::configTwistForwardSoftLimit(float limitDegrees) {
     m_twistForwardSoftLimitDegrees = limitDegrees;
     m_hasTwistForwardSoftLimit = true;
 }
 
-void RoveDifferentialJoint::configTwistReverseSoftLimit(const float& limitDegrees) {
+void RoveDifferentialJoint::configTwistReverseSoftLimit(float limitDegrees) {
     m_twistReverseSoftLimitDegrees = limitDegrees;
     m_hasTwistReverseSoftLimit = true;
 }
 
-void RoveDifferentialJoint::configTwistSoftLimits(const float& reverseLimitDegrees, const float& forwardLimitDegrees) {
+void RoveDifferentialJoint::configTwistSoftLimits(float reverseLimitDegrees, float forwardLimitDegrees) {
     configTwistReverseSoftLimit(reverseLimitDegrees);
     configTwistForwardSoftLimit(forwardLimitDegrees);
 }
 
 
 
-void RoveDifferentialJoint::configTiltForwardSoftLimit(const float& limitDegrees) {
+void RoveDifferentialJoint::configTiltForwardSoftLimit(float limitDegrees) {
     m_tiltForwardSoftLimitDegrees = limitDegrees;
     m_hasTiltForwardSoftLimit = true;
 }
 
-void RoveDifferentialJoint::configTiltReverseSoftLimit(const float& limitDegrees) {
+void RoveDifferentialJoint::configTiltReverseSoftLimit(float limitDegrees) {
     m_tiltReverseSoftLimitDegrees = limitDegrees;
     m_hasTiltReverseSoftLimit = true;
 }
 
-void RoveDifferentialJoint::configTiltSoftLimits(const float& reverseLimitDegrees, const float& forwardLimitDegrees) {
+void RoveDifferentialJoint::configTiltSoftLimits(float reverseLimitDegrees, float forwardLimitDegrees) {
     configTiltReverseSoftLimit(reverseLimitDegrees);
     configTiltForwardSoftLimit(forwardLimitDegrees);
 }
@@ -215,7 +215,7 @@ void RoveDifferentialJoint::drive(int16_t twistDecipercent, int16_t tiltDeciperc
     m_rightMotor->drive(rightDecipercent);
 }
 
-void RoveDifferentialJoint::setAngles(const float& twistTargetDegrees, const float& tiltTargetDegrees) const {
+void RoveDifferentialJoint::setAngles(float twistTargetDegrees, float tiltTargetDegrees) const {
     int16_t twistDecipercent = 0;
     if (m_hasTwistEncoder && m_hasTwistClosedLoop && !atTwistForwardSoftLimit(twistTargetDegrees) && !atTwistReverseSoftLimit(twistTargetDegrees)) {
         twistDecipercent = (int16_t) m_twistPIDController->calculate(twistTargetDegrees, m_twistEncoder->readDegrees());
