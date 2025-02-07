@@ -1,7 +1,7 @@
 #include "RoveJoint.h"
 
 
-bool RoveJoint::atForwardSoftLimit(const float& degrees) const {
+bool RoveJoint::atForwardSoftLimit(float degrees) const {
     if (m_hasForwardSoftLimit) {
         if (m_hasReverseSoftLimit && (m_reverseSoftLimitDegrees > m_forwardSoftLimitDegrees)) {
             return (degrees >= m_forwardSoftLimitDegrees) && (degrees <= (m_reverseSoftLimitDegrees + m_forwardSoftLimitDegrees)/2);
@@ -11,7 +11,7 @@ bool RoveJoint::atForwardSoftLimit(const float& degrees) const {
     return false;
 }
 
-bool RoveJoint::atReverseSoftLimit(const float& degrees) const {
+bool RoveJoint::atReverseSoftLimit(float degrees) const {
     if (m_hasReverseSoftLimit) {
         if (m_hasForwardSoftLimit && (m_reverseSoftLimitDegrees > m_forwardSoftLimitDegrees)) {
             return (degrees <= m_reverseSoftLimitDegrees) && (degrees >= (m_reverseSoftLimitDegrees + m_forwardSoftLimitDegrees)/2);
@@ -52,17 +52,17 @@ void RoveJoint::attachHardLimits(RoveSwitch* reverseHardLimit, RoveSwitch* forwa
 
 
 
-void RoveJoint::configForwardSoftLimit(const float& limitDegrees) {
+void RoveJoint::configForwardSoftLimit(float limitDegrees) {
     m_forwardSoftLimitDegrees = limitDegrees;
     m_hasForwardSoftLimit = true;
 }
 
-void RoveJoint::configReverseSoftLimit(const float& limitDegrees) {
+void RoveJoint::configReverseSoftLimit(float limitDegrees) {
     m_reverseSoftLimitDegrees = limitDegrees;
     m_hasReverseSoftLimit = true;
 }
 
-void RoveJoint::configSoftLimits(const float& reverseLimitDegrees, const float& forwardLimitDegrees) {
+void RoveJoint::configSoftLimits(float reverseLimitDegrees, float forwardLimitDegrees) {
     configReverseSoftLimit(reverseLimitDegrees);
     configForwardSoftLimit(forwardLimitDegrees);
 }
