@@ -141,12 +141,12 @@ void RoveJoint::setAngle(float targetDegrees) const {
     if (!isAngleWithinSoftLimits(targetDegrees)) {
         float distanceToForward = distanceBetweenAngles(targetDegrees, m_forwardSoftLimitDegrees);
         float distanceToReverse = distanceBetweenAngles(targetDegrees, m_reverseSoftLimitDegrees);
-        if (distanceToForward < distanceToReverse) {
+        if (abs(distanceToForward) < abs(distanceToReverse)) {
             if (!m_forwardSoftLimitDisabled) {
                 targetDegrees = m_forwardSoftLimitDegrees;
             }
         } else {
-            if (!m_reverseSoftLimitDegrees) {
+            if (!m_reverseSoftLimitDisabled) {
                 targetDegrees = m_reverseSoftLimitDegrees;
             }
         }
