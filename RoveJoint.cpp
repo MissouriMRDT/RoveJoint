@@ -1,7 +1,7 @@
 #include "RoveJoint.h"
 
 
-bool RoveJoint::atForwardSoftLimit(float degrees) const {
+bool RoveJoint::atForwardSoftLimit(const float& degrees) const {
     if (m_hasForwardSoftLimit) {
         if (m_hasReverseSoftLimit && (m_reverseSoftLimitDegrees > m_forwardSoftLimitDegrees)) {
             return (degrees >= m_forwardSoftLimitDegrees) && (degrees <= (m_reverseSoftLimitDegrees + m_forwardSoftLimitDegrees)/2);
@@ -11,7 +11,7 @@ bool RoveJoint::atForwardSoftLimit(float degrees) const {
     return false;
 }
 
-bool RoveJoint::atReverseSoftLimit(float degrees) const {
+bool RoveJoint::atReverseSoftLimit(const float& degrees) const {
     if (m_hasReverseSoftLimit) {
         if (m_hasForwardSoftLimit && (m_reverseSoftLimitDegrees > m_forwardSoftLimitDegrees)) {
             return (degrees <= m_reverseSoftLimitDegrees) && (degrees >= (m_reverseSoftLimitDegrees + m_forwardSoftLimitDegrees)/2);
@@ -52,17 +52,17 @@ void RoveJoint::attachHardLimits(RoveSwitch* reverseHardLimit, RoveSwitch* forwa
 
 
 
-void RoveJoint::configForwardSoftLimit(float limitDegrees) {
+void RoveJoint::configForwardSoftLimit(const float& limitDegrees) {
     m_forwardSoftLimitDegrees = limitDegrees;
     m_hasForwardSoftLimit = true;
 }
 
-void RoveJoint::configReverseSoftLimit(float limitDegrees) {
+void RoveJoint::configReverseSoftLimit(const float& limitDegrees) {
     m_reverseSoftLimitDegrees = limitDegrees;
     m_hasReverseSoftLimit = true;
 }
 
-void RoveJoint::configSoftLimits(float reverseLimitDegrees, float forwardLimitDegrees) {
+void RoveJoint::configSoftLimits(const float& reverseLimitDegrees, const float& forwardLimitDegrees) {
     configReverseSoftLimit(reverseLimitDegrees);
     configForwardSoftLimit(forwardLimitDegrees);
 }
@@ -108,14 +108,16 @@ bool RoveJoint::atReverseHardLimit() const {
 
 
 void RoveJoint::drive(int16_t decipercent) const {
+    // if moving forward and at a forward limit, turn motor off
     if (decipercent > 0
         && ((!m_forwardSoftLimitDisabled && atForwardSoftLimit()) 
             || (!m_forwardHardLimitDisabled && atForwardHardLimit()))) {
         decipercent = 0;
     }
-    else if (decipercent < 0 
-            && ((!m_reverseSoftLimitDisabled && atReverseSoftLimit()) 
-                || (!m_reverseHardLimitDisabled && atReverseHardLimit()))) {
+    // if moving backward and at a reverse limit, turn motor off
+    else if (decipercent < 0
+        && ((!m_reverseSoftLimitDisabled && atReverseSoftLimit()) 
+            || (!m_reverseHardLimitDisabled && atReverseHardLimit()))) {
         decipercent = 0;
     }
     
@@ -123,14 +125,12 @@ void RoveJoint::drive(int16_t decipercent) const {
 }
 
 void RoveJoint::setAngle(float targetDegrees) const {
-    
-    if ((!m_forwardSoftLimitDisabled && atForwardSoftLimit()) 
-        || (!m_forwardHardLimitDisabled && atForwardHardLimit())) {
-            targetDegrees = m_forwardSoftLimitDegrees;
-    }
-    else if ((!m_reverseSoftLimitDisabled && atReverseSoftLimit()) 
-        || (!m_reverseHardLimitDisabled && atReverseHardLimit())) {
-            targetDegrees = m_reverseSoftLimitDegrees;
+    // if attempting to move past soft limit, clamp the target to the soft limit
+    // ideally, soft limits are hit before hard limits, so this will prevent the joint from hitting the hard limit
+    if (!m_forwardSoftLimitDisabled && (targetDegrees > m_forwardSoftLimitDegrees || atForwardSoftLimit())) {
+        targetDegrees = m_forwardSoftLimitDegrees;
+    } else if (!m_reverseSoftLimitDisabled && (targetDegrees < m_reverseSoftLimitDegrees || atReverseSoftLimit())) {
+        targetDegrees = m_reverseSoftLimitDegrees;
     }
 
     int16_t decipercent = 0;
@@ -138,5 +138,12 @@ void RoveJoint::setAngle(float targetDegrees) const {
         decipercent = (int16_t) m_pidController->calculate(targetDegrees, m_encoder->readDegrees());
     }
     
+    // turn motor off if at hard limit
+    if (decipercent > 0 && (!m_forwardHardLimitDisabled && atForwardHardLimit())) {
+        decipercent = 0;
+    } else if (decipercent < 0 && (!m_reverseHardLimitDisabled && atReverseHardLimit())) {
+        decipercent = 0;
+    }
+
     m_motor->drive(decipercent);
 }
