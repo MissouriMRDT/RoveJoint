@@ -1,5 +1,6 @@
 #include "RoveJoint.h"
 
+#include <Arduino.h>
 
 bool RoveJoint::atForwardSoftLimit(float degrees) const {
     if (m_hasForwardSoftLimit) {
@@ -107,6 +108,17 @@ bool RoveJoint::atReverseHardLimit() const {
 
 
 
+bool RoveJoint::isAngleWithinSoftLimits(float degrees) const {
+    if (m_forwardSoftLimitDegrees > m_reverseSoftLimitDegrees) {
+        return degrees > m_forwardSoftLimitDegrees || degrees < m_reverseSoftLimitDegrees;
+    } else if (m_forwardSoftLimitDegrees < m_reverseSoftLimitDegrees) {
+        return degrees < m_forwardSoftLimitDegrees || degrees > m_reverseSoftLimitDegrees;
+    } else {
+        return true;
+    }
+}
+
+
 void RoveJoint::drive(int16_t decipercent) const {
     // if moving forward and at a forward limit, turn motor off
     if (decipercent > 0
@@ -125,12 +137,19 @@ void RoveJoint::drive(int16_t decipercent) const {
 }
 
 void RoveJoint::setAngle(float targetDegrees) const {
-    // if attempting to move past soft limit, clamp the target to the soft limit
-    // ideally, soft limits are hit before hard limits, so this will prevent the joint from hitting the hard limit
-    if (!m_forwardSoftLimitDisabled && (targetDegrees > m_forwardSoftLimitDegrees || atForwardSoftLimit())) {
-        targetDegrees = m_forwardSoftLimitDegrees;
-    } else if (!m_reverseSoftLimitDisabled && (targetDegrees < m_reverseSoftLimitDegrees || atReverseSoftLimit())) {
-        targetDegrees = m_reverseSoftLimitDegrees;
+    // if attempting to move out of bounds, clamp to nearest target
+    if (!isAngleWithinSoftLimits(targetDegrees)) {
+        float distanceToForward = distanceBetweenAngles(targetDegrees, m_forwardSoftLimitDegrees);
+        float distanceToReverse = distanceBetweenAngles(targetDegrees, m_reverseSoftLimitDegrees);
+        if (distanceToForward < distanceToReverse) {
+            if (!m_forwardSoftLimitDisabled) {
+                targetDegrees = m_forwardSoftLimitDegrees;
+            }
+        } else {
+            if (!m_reverseSoftLimitDegrees) {
+                targetDegrees = m_reverseSoftLimitDegrees;
+            }
+        }
     }
 
     int16_t decipercent = 0;
@@ -146,4 +165,13 @@ void RoveJoint::setAngle(float targetDegrees) const {
     }
 
     m_motor->drive(decipercent);
+}
+
+float RoveJoint::distanceBetweenAngles(float fromAngle, float toAngle) const {
+    float diff = toAngle - fromAngle;
+    if (abs(diff) > 180) {
+        return fmod(180.0 - diff, 360.0);
+    } else {
+        return diff;
+    }
 }

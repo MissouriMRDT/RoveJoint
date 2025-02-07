@@ -204,6 +204,15 @@ public:
      */
     bool atReverseHardLimit() const;
 
+    /**
+     * @brief Check if the given angle is within the soft limits for this joint.
+     * 
+     * @param degrees
+     * 
+     * @return True if the angle is within the soft limits.
+     * @return False if the angle is outside of the soft limits.
+     */
+    bool isAngleWithinSoftLimits(float degrees) const;
 
     /**
      * @brief Write the provided drive signal to the joint.
@@ -218,6 +227,18 @@ public:
      * @param targetDegrees Closed loop target, in degrees.
      */
     void setAngle(float targetDegrees) const;
+
+private:
+
+    /**
+     * @brief Get the distance between two angles. Note that this is a signed distance!
+     * 
+     * @param fromAngle
+     * @param toAngle
+     * 
+     * @return The signed distance between the two angles.
+     */
+    float distanceBetweenAngles(float fromAngle, float toAngle) const;
 
 };
 
