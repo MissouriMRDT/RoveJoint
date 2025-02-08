@@ -109,8 +109,12 @@ bool RoveJoint::atReverseHardLimit() const {
 
 
 bool RoveJoint::isAngleWithinSoftLimits(float degrees) const {
+    // Two cases to check for. '#' is within soft limits
+    // 0 |----R-########-F----> 360
+    // 0 |###-F----------R-###> 360
+    // These cases hold for range [-180, 180) as well
     if (m_forwardSoftLimitDegrees > m_reverseSoftLimitDegrees) {
-        return degrees > m_forwardSoftLimitDegrees || degrees < m_reverseSoftLimitDegrees;
+        return degrees < m_forwardSoftLimitDegrees && degrees > m_reverseSoftLimitDegrees;
     } else if (m_forwardSoftLimitDegrees < m_reverseSoftLimitDegrees) {
         return degrees < m_forwardSoftLimitDegrees || degrees > m_reverseSoftLimitDegrees;
     } else {
