@@ -108,7 +108,7 @@ bool RoveJoint::atReverseHardLimit() const {
 
 
 
-bool RoveJoint::isAngleWithinSoftLimits(float degrees) const {
+bool RoveJoint::isAngleWithinRangeOfMotion(float degrees) const {
     // Two cases to check for. '#' is within soft limits
     // 0 |----R-########-F----> 360
     // 0 |###-F----------R-###> 360
@@ -142,7 +142,7 @@ void RoveJoint::drive(int16_t decipercent) const {
 
 void RoveJoint::setAngle(float targetDegrees) const {
     // if attempting to move out of bounds, clamp to nearest target
-    if (!isAngleWithinSoftLimits(targetDegrees)) {
+    if (!isAngleWithinRangeOfMotion(targetDegrees)) {
         float distanceToForward = distanceBetweenAngles(targetDegrees, m_forwardSoftLimitDegrees);
         float distanceToReverse = distanceBetweenAngles(targetDegrees, m_reverseSoftLimitDegrees);
         if (abs(distanceToForward) < abs(distanceToReverse)) {

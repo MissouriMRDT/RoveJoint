@@ -212,7 +212,7 @@ public:
      * @return True if the angle is within the soft limits.
      * @return False if the angle is outside of the soft limits.
      */
-    bool isAngleWithinSoftLimits(float degrees) const;
+    bool isAngleWithinRangeOfMotion(float degrees) const;
 
     /**
      * @brief Write the provided drive signal to the joint.
