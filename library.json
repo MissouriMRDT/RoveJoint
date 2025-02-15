@@ -11,6 +11,7 @@
   "frameworks": [ "arduino" ],
   "platforms": [ "titiva", "teensy" ],
   "dependencies": {
+      "RoveMotor": "https://github.com/MissouriMRDT/RoveMotor.git",
       "RoveSwitch": "https://github.com/MissouriMRDT/RoveSwitch.git",
       "RoveEncoder": "https://github.com/MissouriMRDT/RoveEncoder.git",
       "RoveControl": "https://github.com/MissouriMRDT/RoveControl.git"
