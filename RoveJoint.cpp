@@ -114,9 +114,9 @@ bool RoveJoint::isAngleWithinSoftLimits(float degrees) const {
     // 0 |###-F----------R-###> 360
     // These cases hold for range [-180, 180) as well
     if (m_forwardSoftLimitDegrees > m_reverseSoftLimitDegrees) {
-        return degrees < m_forwardSoftLimitDegrees && degrees > m_reverseSoftLimitDegrees;
+        return (degrees < m_forwardSoftLimitDegrees) && (degrees > m_reverseSoftLimitDegrees);
     } else if (m_forwardSoftLimitDegrees < m_reverseSoftLimitDegrees) {
-        return degrees < m_forwardSoftLimitDegrees || degrees > m_reverseSoftLimitDegrees;
+        return (degrees < m_forwardSoftLimitDegrees) || (degrees > m_reverseSoftLimitDegrees);
     } else {
         return true;
     }
@@ -142,23 +142,23 @@ void RoveJoint::drive(int16_t decipercent) const {
 
 void RoveJoint::setAngle(float targetDegrees) const {
     // if attempting to move out of bounds, clamp to nearest target
-    if (!isAngleWithinSoftLimits(targetDegrees)) {
-        float distanceToForward = distanceBetweenAngles(targetDegrees, m_forwardSoftLimitDegrees);
-        float distanceToReverse = distanceBetweenAngles(targetDegrees, m_reverseSoftLimitDegrees);
-        if (abs(distanceToForward) < abs(distanceToReverse)) {
-            if (!m_forwardSoftLimitDisabled) {
-                targetDegrees = m_forwardSoftLimitDegrees;
-            }
-        } else {
-            if (!m_reverseSoftLimitDisabled) {
-                targetDegrees = m_reverseSoftLimitDegrees;
-            }
-        }
-    }
+    // if (!isAngleWithinSoftLimits(targetDegrees)) {
+    //     float distanceToForward = distanceBetweenAngles(targetDegrees, m_forwardSoftLimitDegrees);
+    //     float distanceToReverse = distanceBetweenAngles(targetDegrees, m_reverseSoftLimitDegrees);
+    //     if (abs(distanceToForward) < abs(distanceToReverse)) {
+    //         if (!m_forwardSoftLimitDisabled) {
+    //             targetDegrees = m_forwardSoftLimitDegrees;
+    //         }
+    //     } else {
+    //         if (!m_reverseSoftLimitDisabled) {
+    //             targetDegrees = m_reverseSoftLimitDegrees;
+    //         }
+    //     }
+    // }
 
     int16_t decipercent = 0;
     if (m_hasEncoder && m_hasClosedLoop) {
-        decipercent = (int16_t) m_pidController->calculate(targetDegrees, m_encoder->readDegrees());
+        decipercent = (int16_t) std::clamp(m_pidController->calculate(targetDegrees, m_encoder->readDegrees()), (float)INT16_MIN, (float)INT16_MAX);
     }
     
     // turn motor off if at hard limit
