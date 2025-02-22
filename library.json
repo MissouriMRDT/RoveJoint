@@ -1,0 +1,21 @@
+{
+  "name": "RoveJoint",
+  "author": "MissouriMRDT",
+  "version": "1.0.0",
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/MissouriMRDT/RoveJoint.git"
+  },
+  "description": "Embedded software libraries for control of robotic joints, developed for use with Arduino.",
+  "keywords": [ "rovejoint", "mrdt" ],
+  "frameworks": [ "arduino" ],
+  "platforms": [ "titiva", "teensy" ],
+  "dependencies": {
+      "RoveMotor": "https://github.com/MissouriMRDT/RoveMotor.git",
+      "RoveSwitch": "https://github.com/MissouriMRDT/RoveSwitch.git",
+      "RoveEncoder": "https://github.com/MissouriMRDT/RoveEncoder.git",
+      "RoveControl": "https://github.com/MissouriMRDT/RoveControl.git"
+  },
+  "examples": []
+}
+  
